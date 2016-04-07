@@ -1,3 +1,10 @@
+/*
+ *	Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
+ *	Do with this whatever you want, but keep thes Header and tell
+ *	the others what you changed!
+ */
+
+
 #ifndef MCAN_h
 #define MCAN_h
 
