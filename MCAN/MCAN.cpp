@@ -40,8 +40,6 @@ void MCAN::initMCAN(bool debug){
 	}else if (can.begin(CAN_250KBPS) == CAN_OK){
 		digitalWrite(9,1);
 	}
-
-	return hash;
 }
 
 void MCAN::sendCanFrame(MCANMSG can_frame){
