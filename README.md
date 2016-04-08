@@ -21,7 +21,7 @@ Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, au
   * [MCANMSG](#mcanmsg)
 * [Funktionen](#funktionen)
   * [generateHash(uid)](#generatehashuid)
-  * [initMCAN](#initmcan)
+  * [initMCAN(debug)](#initmcandebug)
   * [sendCanFrame(can_frame)](#sendcanframecan_frame)
   * [getCanFrame()](#getcanframe)
 
