@@ -10,7 +10,7 @@ Hier entsteht ein System zur digitalen Steuerung einer Modellbahn, das auf dem C
 
 Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, auf den Märklin CAN-Bus zuzugreifen. Dabei ist es nicht notwendig irgendwelche Berechnungen durchzuführen. Die CAN-Frames werden in nahezu selbsterklärender Weise dageboten
 
-##Dokumentation MCAN-Bibliothek
+## Dokumentation MCAN-Bibliothek
 
 #### Konstanten
 
@@ -39,7 +39,7 @@ Hierbei handelt es sich um einen Struct, der alle relevanten Informationen über
 ````
 ````
 
-####generateHash(uid)
+#### generateHash(uid)
 
 Diese funktion kann dazu genutzt, um aus der 32-bit UID der CAN-Komponente gemäß der Dokumentation von Märklin den Hash zu generieren.
 
@@ -62,3 +62,45 @@ Für den Hash ergäbe sich dann
 hash = 0x474C
 ````
 Weitere Informationen zum Hash und dessen berechnung sind [Hier](http://medienpdb.maerklin.de/digital22008/files/cs2CAN-Protokoll-2_0.pdf) unter dem Punkt "1.2.4 Hash" zu finden.
+
+#### initMCAN(debug)
+
+Diese Funktion initialisiert den CAN-Controller.
+Der Parameter "debug" aktiviert bzw. deaktiviert die Ausgabe von Informationen über die Serielle Schnittstelle des Arduini/µC. Mögliche Werte sind "true" und "false".
+
+Beispiel:
+````
+#include <MCAN.h>
+
+MCAN mcan;
+
+void setup() {
+  mcan.initMCAN(false);
+}
+````
+
+#### sendCanFrame(can_frame)
+
+Hiermit werden CAN-Frames auf den Bus geschickt. "can_frame" ist vom Typ "MCANMSG", wie [weiter oben](#MCANMSG) beschrieben.
+
+#### getCanFrame()
+
+Empfängt einen CAN-Frame vom Bus. Gibt einen Frame vom Typ "MCANMSG" zurück.
+
+Beispiel:
+````
+#include <MCAN.h>
+
+MCAN mcan;
+
+MCANMSG can_frame_in;
+
+void setup() {
+  pinMode(2, INPUT);
+  mcan.initMCAN(false);
+}
+void loop() {
+  if(!digitalRead(2)) can_frame_in = mcan.getCanFrame();
+}
+````
+Alernativ kann hier der Pin 2 (gemäß Arduino-Pinout) als Interrupt benutzt werden.
