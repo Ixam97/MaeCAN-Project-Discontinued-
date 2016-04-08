@@ -37,6 +37,26 @@ Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, au
 
 Hierbei handelt es sich um einen Struct, der alle relevanten Informationen über einen CAN-Frame, wie er von Märklin dokumentiert ist, beinhaltet.
 ````
+uint8_t cmd      //CAN-Befehl (s.o.)
+uint16_t hash    //Berechneter oder festgelegter Hash
+bool resp_bit    //gesetztes oder nicht gesetztes Response-Bit
+uint8_t dlc      //Anzahl der Daten-Bytes
+uint8_t data[8]  //Daten-Bytes
+````
+Beispiel (Frame für die Antwort auf einen Ping):
+````
+  can_frame.cmd = PING;
+  can_frame.hash = hash;
+  can_frame.resp_bit = true;
+  can_frame.dlc = 8;
+  can_frame.data[0] = UID >> 24;
+  can_frame.data[1] = UID >> 16;
+  can_frame.data[2] = UID >> 8;
+  can_frame.data[3] = UID;
+  can_frame.data[4] = 0x00;
+  can_frame.data[5] = 0x00;
+  can_frame.data[6] = 0x00;
+  can_frame.data[7] = 0x00;
 ````
 
 #### generateHash(uid)
