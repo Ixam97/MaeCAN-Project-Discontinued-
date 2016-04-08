@@ -1,6 +1,6 @@
 # MäCAN-Project
 
-![Alt Tag](mäcan-logo.png)
+![MäCAN](images/mäcan-logo.png)
 
 by [Maximilian Goldschmidt](mailto:maxigoldschmidt@gmail.com)
 
