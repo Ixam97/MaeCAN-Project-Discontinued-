@@ -81,7 +81,7 @@ void setup() {
 
 #### sendCanFrame(can_frame)
 
-Hiermit werden CAN-Frames auf den Bus geschickt. "can_frame" ist vom Typ "MCANMSG", wie [weiter oben](#MCANMSG) beschrieben.
+Hiermit werden CAN-Frames auf den Bus geschickt. "can_frame" ist vom Typ "MCANMSG", wie [weiter oben](#mcanmsg) beschrieben.
 
 #### getCanFrame()
 
