@@ -12,6 +12,12 @@ Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, au
 
 ## Dokumentation MCAN-Bibliothek
 
+#### Inhalt
+
+* [Konstanten](#konstanten)
+* [Datentypen](#datentypen)
+* [Funktionen](#funktionen)
+
 #### Konstanten
 
 ###### CAN-Befehle
@@ -33,7 +39,9 @@ Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, au
  DCC_TRACK 	0xC000	//Gleissignal NRMA_DCC
 ````
 
-#### MCANMSG
+#### Datentypen
+
+###### MCANMSG
 
 Hierbei handelt es sich um einen Struct, der alle relevanten Informationen über einen CAN-Frame, wie er von Märklin dokumentiert ist, beinhaltet.
 ````
@@ -59,7 +67,9 @@ Beispiel (Frame für die Antwort auf einen Ping):
   can_frame.data[7] = 0x00;
 ````
 
-#### generateHash(uid)
+#### Funktionen
+
+###### generateHash(uid)
 
 Diese funktion kann dazu genutzt, um aus der 32-bit UID der CAN-Komponente gemäß der Dokumentation von Märklin den Hash zu generieren.
 
@@ -83,7 +93,7 @@ hash = 0x474C
 ````
 Weitere Informationen zum Hash und dessen berechnung sind [Hier](http://medienpdb.maerklin.de/digital22008/files/cs2CAN-Protokoll-2_0.pdf) unter dem Punkt "1.2.4 Hash" zu finden.
 
-#### initMCAN(debug)
+###### initMCAN(debug)
 
 Diese Funktion initialisiert den CAN-Controller.
 Der Parameter "debug" aktiviert bzw. deaktiviert die Ausgabe von Informationen über die Serielle Schnittstelle des Arduini/µC. Mögliche Werte sind "true" und "false".
@@ -99,11 +109,11 @@ void setup() {
 }
 ````
 
-#### sendCanFrame(can_frame)
+###### sendCanFrame(can_frame)
 
 Hiermit werden CAN-Frames auf den Bus geschickt. "can_frame" ist vom Typ "MCANMSG", wie [weiter oben](#mcanmsg) beschrieben.
 
-#### getCanFrame()
+###### getCanFrame()
 
 Empfängt einen CAN-Frame vom Bus. Gibt einen Frame vom Typ "MCANMSG" zurück.
 
