@@ -15,8 +15,15 @@ Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, au
 #### Inhalt
 
 * [Konstanten](#konstanten)
+  * [CAN-Befehle](#can-befehle)
+  * [Protokolle](#protokolle)
 * [Datentypen](#datentypen)
+  * [MCANMSG](#mcanmsg)
 * [Funktionen](#funktionen)
+  * [generateHash(uid)](#generatehashuid)
+  * [initMCAN](#initmcan)
+  * [sendCanFrame(can_frame)](#sendcanframecan_frame)
+  * [getCanFrame()](#getcanframe)
 
 #### Konstanten
 
