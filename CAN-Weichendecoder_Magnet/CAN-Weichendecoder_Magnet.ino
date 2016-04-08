@@ -48,8 +48,9 @@ void setup() {
     pinMode(acc_pin_grn[i], OUTPUT);
     pinMode(acc_pin_rm[i], INPUT);
   }
-  
-  hash = mcan.initMCAN(UID, false);
+
+  mcan.generateHash(UID);
+  mcan.initMCAN(false);
   attachInterrupt(digitalPinToInterrupt(2), interruptFn, LOW);
   //pinMode(2, INPUT);
 
