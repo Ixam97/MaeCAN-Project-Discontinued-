@@ -14,7 +14,7 @@ MCP_CAN can(10);
 uint32_t rxId;
 
 uint16_t MCAN::generateHash(uint32_t uid){
-	uint16_t highbyte = uid >> 8;
+	uint16_t highbyte = uid >> 16;
 	uint16_t lowbyte = uid;
 	uint16_t hash = highbyte ^ lowbyte;
 	bitWrite(hash, 7, 0);
@@ -23,8 +23,7 @@ uint16_t MCAN::generateHash(uint32_t uid){
 	return hash;
 }
 
-uint16_t MCAN::initMCAN(uint32_t uid, bool debug){
-	uint16_t hash = generateHash(uid);
+void MCAN::initMCAN(bool debug){
 	pinMode(9,OUTPUT);
 	digitalWrite(9,0);
 	if (debug)

@@ -40,7 +40,7 @@ typedef struct {
 class MCAN{
 public:
 	uint16_t generateHash(uint32_t uid);
-	uint16_t initMCAN(uint32_t uid, bool debug);
+	void initMCAN(bool debug);
 	void sendCanFrame(MCANMSG can_frame);
 	MCANMSG getCanFrame();
 	void printCanFrame(MCANMSG can_frame);
