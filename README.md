@@ -27,6 +27,8 @@ Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, au
 
 #### Konstanten
 
+Die folgenden Konstanten werden in der Bibliothek definiert und können nach Bedarf im Sketch eingesetzt werden. Das Merken der jeweiligen HEX-Zahlen entfällt damit.
+
 ###### CAN-Befehle
 ````
  SYS_CMD	0x00 	//Systembefehle (abhängig von Unterbefehlen!)
