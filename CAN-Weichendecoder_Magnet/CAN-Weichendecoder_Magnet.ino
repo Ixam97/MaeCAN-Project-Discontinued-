@@ -52,7 +52,6 @@ void setup() {
   mcan.generateHash(UID);
   mcan.initMCAN(false);
   attachInterrupt(digitalPinToInterrupt(2), interruptFn, LOW);
-  //pinMode(2, INPUT);
 
   for(int i = 0; i < 4; i++){
     acc_state_is[i] = EEPROM.read(i);
@@ -60,6 +59,11 @@ void setup() {
   }
 }
 
+/*
+ * Funktion zum schalten der Ausgänge
+ * Schalteit: 20ms
+ * Jeder Ausgang wird zwei mal HIGH für doppelte Redundanz.
+ */
 void switchAcc(int acc_num, bool set_state){
   if(!set_state){
     digitalWrite(acc_pin_red[acc_num], HIGH);
@@ -90,6 +94,9 @@ void switchAcc(int acc_num, bool set_state){
   }
 }
 
+/*
+ * Meldung nach erfolgreichem Schalten
+ */
 void switchAccResponse(int acc_num, bool set_state){
   can_frame_out.cmd = SWITCH_ACC;
   can_frame_out.hash = hash;
@@ -99,16 +106,19 @@ void switchAccResponse(int acc_num, bool set_state){
   can_frame_out.data[1] = 0;
   can_frame_out.data[2] = acc_adrs[acc_num] >> 8;
   can_frame_out.data[3] = acc_adrs[acc_num];
-  can_frame_out.data[4] = set_state;
+  can_frame_out.data[4] = set_state;            /* Meldung der Lage für Märklin-Geräte.*/
   can_frame_out.data[5] = 0;
 
   mcan.sendCanFrame(can_frame_out);
   
-  can_frame_out.data[4] = 0xfe - set_state;
+  can_frame_out.data[4] = 0xfe - set_state;     /* Meldung für CdB-Module und Rocrail Feldereignisse. */
   
   mcan.sendCanFrame(can_frame_out);
 }
 
+/*
+ * Antwort auf einen Ping Request.
+ */
 void pingResponse(){
   can_frame_out.cmd = PING;
   can_frame_out.hash = hash;
@@ -126,13 +136,17 @@ void pingResponse(){
   mcan.sendCanFrame(can_frame_out);
 }
 
+/*
+ * Ausführen, wenn eine Nachricht verfügbar ist.
+ * Nachricht wird geladen und anhängig vom CAN-Befehl verarbeitet.
+ */
 void interruptFn(){
   can_frame_in = mcan.getCanFrame();
   //mcan.printCanFrame(can_frame_in);
-    if((can_frame_in.cmd == SWITCH_ACC) && (can_frame_in.resp_bit == 0)){
+    if((can_frame_in.cmd == SWITCH_ACC) && (can_frame_in.resp_bit == 0)){     //Abhandlung bei gültigem Weichenbefehl
       uint16_t adrs = (can_frame_in.data[2] << 8) | can_frame_in.data[3];
       for(int i = 0; i < 4; i++){
-        if(adrs == acc_adrs[i]){
+        if(adrs == acc_adrs[i]){                                              //Auf benutzte Adresse überprüfen
           //switchAcc(i, can_frame_in.data[4]);
           acc_got_cmd[i] = true;
           acc_state_set[i] = can_frame_in.data[4];
@@ -141,21 +155,21 @@ void interruptFn(){
         }
       }
     }
-    if((can_frame_in.cmd == PING) && (can_frame_in.resp_bit == 0)){
+    if((can_frame_in.cmd == PING) && (can_frame_in.resp_bit == 0)){          //Auf Ping Request antworten
       pingResponse();
     }
 }
 
 void loop() {
   for(int i = 0; i < 4; i++){
-    if(acc_state_is[i] != digitalRead(acc_pin_rm[i])){
+    if(acc_state_is[i] != digitalRead(acc_pin_rm[i])){                        //Änderungen der Weichenlage überprüfen
       acc_state_is[i] = digitalRead(acc_pin_rm[i]);
       if(acc_state_is[i] != acc_state_set[i]){
          switchAccResponse(i, acc_state_is[i]);
         acc_state_set[i] = acc_state_is[i];
       }
     }
-    if(acc_got_cmd[i]){
+    if(acc_got_cmd[i]){                                                       //Nach eingegangenem Weichenbefehl schalten
       switchAcc(i, acc_state_set[i]);
       acc_got_cmd[i] = false;
     }
