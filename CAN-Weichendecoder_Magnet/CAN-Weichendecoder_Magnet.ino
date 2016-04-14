@@ -8,7 +8,10 @@
  * Gleissignal Motorola: MM_TRACK
  * Gleissignal NRMA-DCC: DCC_TRACK
  */
-#define PROTOCOL DCC_ACC
+#define PROTOCOL_1 DCC_ACC
+#define PROTOCOL_2 DCC_ACC
+#define PROTOCOL_3 DCC_ACC
+#define PROTOCOL_4 DCC_ACC
 
 /*
  * Adressen der Ausgänge festlegen:
@@ -26,14 +29,14 @@
 /*
  * Variablen der Magnetartikel:
  */
-static uint16_t acc_adrs[4] = {PROTOCOL + ADRS_1 - 1,PROTOCOL + ADRS_2 - 1,PROTOCOL + ADRS_3 - 1,PROTOCOL + ADRS_4 - 1};
+uint16_t acc_adrs[4] = {PROTOCOL_1 + ADRS_1 - 1,PROTOCOL_2 + ADRS_2 - 1,PROTOCOL_3 + ADRS_3 - 1,PROTOCOL_4 + ADRS_4 - 1};
 bool acc_got_cmd[4];
 bool acc_state_is[4];
 bool acc_state_set[4];
 bool acc_state_rm[4];
-int acc_pin_grn[4] = {0,3,5,7};
-int acc_pin_red[4] = {1,4,6,8};
-int acc_pin_rm[4] = {A5,A4,A3,A2};
+static int acc_pin_grn[4] = {0,3,5,7};
+static int acc_pin_red[4] = {1,4,6,8};
+static int acc_pin_rm[4] = {A3,A2,A1,A0};
 uint16_t hash;
 
 MCAN mcan;
@@ -136,28 +139,34 @@ void pingResponse(){
   mcan.sendCanFrame(can_frame_out);
 }
 
+void isAccFrame(){  
+  if((can_frame_in.cmd == SWITCH_ACC) && (can_frame_in.resp_bit == 0)){     //Abhandlung bei gültigem Weichenbefehl
+    uint16_t adrs = (can_frame_in.data[2] << 8) | can_frame_in.data[3];
+    for(int i = 0; i < 4; i++){
+       if(adrs == acc_adrs[i]){                                              //Auf benutzte Adresse überprüfen
+        //switchAcc(i, can_frame_in.data[4]);
+        acc_got_cmd[i] = true;
+        acc_state_set[i] = can_frame_in.data[4];
+        switchAccResponse(i, can_frame_in.data[4]);
+        break;
+      }
+    }
+  }
+}
+
+void isPingFrame(){  
+  if((can_frame_in.cmd == PING) && (can_frame_in.resp_bit == 0)){          //Auf Ping Request antworten
+    pingResponse();
+  }
+}
 /*
  * Ausführen, wenn eine Nachricht verfügbar ist.
  * Nachricht wird geladen und anhängig vom CAN-Befehl verarbeitet.
  */
 void interruptFn(){
   can_frame_in = mcan.getCanFrame();
-  //mcan.printCanFrame(can_frame_in);
-    if((can_frame_in.cmd == SWITCH_ACC) && (can_frame_in.resp_bit == 0)){     //Abhandlung bei gültigem Weichenbefehl
-      uint16_t adrs = (can_frame_in.data[2] << 8) | can_frame_in.data[3];
-      for(int i = 0; i < 4; i++){
-        if(adrs == acc_adrs[i]){                                              //Auf benutzte Adresse überprüfen
-          //switchAcc(i, can_frame_in.data[4]);
-          acc_got_cmd[i] = true;
-          acc_state_set[i] = can_frame_in.data[4];
-          switchAccResponse(i, can_frame_in.data[4]);
-          break;
-        }
-      }
-    }
-    if((can_frame_in.cmd == PING) && (can_frame_in.resp_bit == 0)){          //Auf Ping Request antworten
-      pingResponse();
-    }
+  isAccFrame();
+  isPingFrame();
 }
 
 void loop() {
@@ -175,3 +184,27 @@ void loop() {
     }
   }
 }
+
+/*
+ * Ab hier experimenteller Code, um Parameter über den CAN-Bus zu programmieren:
+ */
+
+void isProgFrame(){
+  if((can_frame_in.cmd == PROG) && (can_frame_in.resp_bit == 0)){
+    uint32_t target_uid = ((can_frame_in.data[0] << 24) | (can_frame_in.data[2] << 16) | (can_frame_in.data[3] << 8) | (can_frame_in.data[4]));
+    if(target_uid == UID){
+      for(int i = 0; i < 4; i++){
+        if(can_frame_in.data[4] == PROG_ADRS){
+          break;
+        }
+        if(can_frame_in.data[4] == PROG_TIME){
+          break;
+        }
+        if(can_frame_in.data[4] == PROG_ANGLE){
+          break;
+        }
+      }
+    }
+  }
+}
+
