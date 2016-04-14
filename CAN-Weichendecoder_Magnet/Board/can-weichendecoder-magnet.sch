@@ -15234,6 +15234,8 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <part name="X1" library="con-tycoelectronics" deviceset="RJ45*2" device="1-B" technology="-6L"/>
 <part name="X2" library="con-tycoelectronics" deviceset="RJ45*2" device="1-B" technology="-6L"/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
+<part name="SV7" library="con-lstb" deviceset="MA03-1" device="" value="CAN"/>
+<part name="SV8" library="con-lstb" deviceset="MA03-1" device="" value="I²C"/>
 </parts>
 <sheets>
 <sheet>
@@ -15326,6 +15328,8 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <instance part="X1" gate="G$1" x="-15.24" y="88.9" rot="R180"/>
 <instance part="X2" gate="G$1" x="-15.24" y="60.96" rot="R180"/>
 <instance part="GND3" gate="1" x="210.82" y="27.94"/>
+<instance part="SV7" gate="G$1" x="-17.78" y="35.56"/>
+<instance part="SV8" gate="G$1" x="208.28" y="55.88" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -15433,9 +15437,12 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <junction x="27.94" y="66.04"/>
 </segment>
 <segment>
-<wire x1="17.78" y1="43.18" x2="15.24" y2="43.18" width="0.1524" layer="91"/>
-<label x="15.24" y="43.18" size="1.27" layer="95" rot="R180" xref="yes"/>
+<label x="12.7" y="43.18" size="1.27" layer="95" rot="R90" xref="yes"/>
 <pinref part="R3" gate="G$1" pin="2"/>
+<wire x1="17.78" y1="43.18" x2="-2.54" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="-2.54" y1="43.18" x2="-2.54" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="SV7" gate="G$1" pin="3"/>
+<wire x1="-2.54" y1="38.1" x2="-10.16" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="CAN-H" class="0">
@@ -15455,8 +15462,11 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 </segment>
 <segment>
 <pinref part="JP1" gate="A" pin="2"/>
-<wire x1="27.94" y1="40.64" x2="15.24" y2="40.64" width="0.1524" layer="91"/>
-<label x="15.24" y="40.64" size="1.27" layer="95" rot="R180" xref="yes"/>
+<wire x1="27.94" y1="40.64" x2="0" y2="40.64" width="0.1524" layer="91"/>
+<label x="12.7" y="40.64" size="1.27" layer="95" rot="R270" xref="yes"/>
+<wire x1="0" y1="40.64" x2="0" y2="35.56" width="0.1524" layer="91"/>
+<pinref part="SV7" gate="G$1" pin="2"/>
+<wire x1="0" y1="35.56" x2="-10.16" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -15506,6 +15516,9 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <pinref part="C4" gate="G$1" pin="1"/>
 <wire x1="68.58" y1="40.64" x2="66.04" y2="40.64" width="0.1524" layer="91"/>
 <junction x="66.04" y="40.64"/>
+<pinref part="SV7" gate="G$1" pin="1"/>
+<wire x1="-10.16" y1="33.02" x2="38.1" y2="33.02" width="0.1524" layer="91"/>
+<junction x="38.1" y="33.02"/>
 </segment>
 <segment>
 <pinref part="SV1" gate="1" pin="6"/>
@@ -15590,8 +15603,12 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <junction x="210.82" y="63.5"/>
 <pinref part="GND3" gate="1" pin="GND"/>
 <pinref part="IC3" gate="G$1" pin="22"/>
-<wire x1="185.42" y1="43.18" x2="210.82" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="185.42" y1="43.18" x2="200.66" y2="43.18" width="0.1524" layer="91"/>
 <junction x="210.82" y="43.18"/>
+<pinref part="SV8" gate="G$1" pin="3"/>
+<wire x1="200.66" y1="43.18" x2="210.82" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="200.66" y1="53.34" x2="200.66" y2="43.18" width="0.1524" layer="91"/>
+<junction x="200.66" y="43.18"/>
 </segment>
 </net>
 <net name="RESET" class="0">
@@ -15912,48 +15929,48 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <segment>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="187.96" y1="96.52" x2="190.5" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="190.5" y1="96.52" x2="190.5" y2="58.42" width="0.1524" layer="91"/>
-<pinref part="IC3" gate="G$1" pin="28"/>
-<wire x1="190.5" y1="58.42" x2="185.42" y2="58.42" width="0.1524" layer="91"/>
+<wire x1="190.5" y1="96.52" x2="190.5" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="R10" gate="G$1" pin="1"/>
 <wire x1="190.5" y1="96.52" x2="200.66" y2="96.52" width="0.1524" layer="91"/>
 <junction x="190.5" y="96.52"/>
+<pinref part="IC3" gate="G$1" pin="26"/>
+<wire x1="185.42" y1="53.34" x2="190.5" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$29" class="0">
 <segment>
 <pinref part="R7" gate="G$1" pin="2"/>
 <wire x1="187.96" y1="91.44" x2="193.04" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="193.04" y1="91.44" x2="193.04" y2="55.88" width="0.1524" layer="91"/>
-<pinref part="IC3" gate="G$1" pin="27"/>
-<wire x1="193.04" y1="55.88" x2="185.42" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="193.04" y1="91.44" x2="193.04" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="R11" gate="G$1" pin="1"/>
 <wire x1="193.04" y1="91.44" x2="200.66" y2="91.44" width="0.1524" layer="91"/>
 <junction x="193.04" y="91.44"/>
+<pinref part="IC3" gate="G$1" pin="25"/>
+<wire x1="185.42" y1="50.8" x2="193.04" y2="50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$30" class="0">
 <segment>
 <pinref part="R8" gate="G$1" pin="2"/>
 <wire x1="187.96" y1="86.36" x2="195.58" y2="86.36" width="0.1524" layer="91"/>
-<wire x1="195.58" y1="86.36" x2="195.58" y2="53.34" width="0.1524" layer="91"/>
-<pinref part="IC3" gate="G$1" pin="26"/>
-<wire x1="195.58" y1="53.34" x2="185.42" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="195.58" y1="86.36" x2="195.58" y2="48.26" width="0.1524" layer="91"/>
 <pinref part="R12" gate="G$1" pin="1"/>
 <wire x1="195.58" y1="86.36" x2="200.66" y2="86.36" width="0.1524" layer="91"/>
 <junction x="195.58" y="86.36"/>
+<pinref part="IC3" gate="G$1" pin="24"/>
+<wire x1="185.42" y1="48.26" x2="195.58" y2="48.26" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$31" class="0">
 <segment>
 <pinref part="R9" gate="G$1" pin="2"/>
 <wire x1="187.96" y1="81.28" x2="198.12" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="198.12" y1="81.28" x2="198.12" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="IC3" gate="G$1" pin="25"/>
-<wire x1="198.12" y1="50.8" x2="185.42" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="198.12" y1="81.28" x2="198.12" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="R13" gate="G$1" pin="1"/>
 <wire x1="198.12" y1="81.28" x2="200.66" y2="81.28" width="0.1524" layer="91"/>
 <junction x="198.12" y="81.28"/>
+<pinref part="IC3" gate="G$1" pin="23"/>
+<wire x1="185.42" y1="45.72" x2="198.12" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -15999,6 +16016,20 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <pinref part="IC2" gate="G$1" pin="8"/>
 <wire x1="76.2" y1="40.64" x2="81.28" y2="40.64" width="0.1524" layer="91"/>
 <junction x="76.2" y="40.64"/>
+</segment>
+</net>
+<net name="N$33" class="0">
+<segment>
+<pinref part="SV8" gate="G$1" pin="1"/>
+<pinref part="IC3" gate="G$1" pin="28"/>
+<wire x1="200.66" y1="58.42" x2="185.42" y2="58.42" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$34" class="0">
+<segment>
+<pinref part="IC3" gate="G$1" pin="27"/>
+<pinref part="SV8" gate="G$1" pin="2"/>
+<wire x1="185.42" y1="55.88" x2="200.66" y2="55.88" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
