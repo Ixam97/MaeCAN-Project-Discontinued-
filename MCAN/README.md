@@ -7,6 +7,7 @@ Die MCAN-Bibliothek dient dazu, eine einfache Möglichkeit zu haben, auf den Mä
 
 #### Inhalt
 
+* [Hinweise](#hinweise)
 * [Konstanten](#konstanten)
   * [CAN-Befehle](#can-befehle)
   * [Protokolle](#protokolle)
@@ -17,6 +18,10 @@ Die MCAN-Bibliothek dient dazu, eine einfache Möglichkeit zu haben, auf den Mä
   * [initMCAN(debug)](#initmcandebug)
   * [sendCanFrame(can_frame)](#sendcanframecan_frame)
   * [getCanFrame()](#getcanframe)
+
+#### Hinweise
+
+Die Bibliothek "MCP_CAN" muss ebenfalls installiert sein! Andernfalls ist die MCAN-Bibliothek nicht funktionsfähig!
 
 #### Konstanten
 
