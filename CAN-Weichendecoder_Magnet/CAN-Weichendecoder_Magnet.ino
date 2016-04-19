@@ -1,3 +1,11 @@
+/*
+ * MäCAN-Weichendecoder V0.1, Rev A, Software-Version 0.1
+ * 
+ *  Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
+ *  Do with this whatever you want, but keep thes Header and tell
+ *  the others what you changed!
+ */
+
 #include <MCAN.h>
 #include <EEPROM.h>
 /*
@@ -186,7 +194,7 @@ void loop() {
 }
 
 /*
- * Ab hier experimenteller Code, um Parameter über den CAN-Bus zu programmieren:
+ * Ab hier experimenteller Code, um Parameter über den CAN-Bus zu programmieren (noch nicht verwendet!):
  */
 
 void isProgFrame(){
