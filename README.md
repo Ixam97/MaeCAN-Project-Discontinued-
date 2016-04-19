@@ -6,9 +6,13 @@ by [Maximilian Goldschmidt](mailto:maxigoldschmidt@gmail.com)
 
 Hier entsteht ein System zur digitalen Steuerung einer Modellbahn, das auf dem CAN-Bus-Protokoll von Märklin basiert. Ziel ist es, eine preisgünstige und frei zugängliche Lösung zu schaffen.
 
+* [MäCAN-Bibliothek](#mäcan-bibliothek)
+* [MäCAN-Weichendecoder (Magnet)](#mäcan-weichendecodermagnet)
+
 # MäCAN-Bibliothek
 
 Die [MCAN-Bibliothek](MCAN/) dient dazu, eine einfache Möglichkeit zu haben, auf den Märklin CAN-Bus zuzugreifen. Dabei ist es nicht notwendig irgendwelche Berechnungen durchzuführen. Die CAN-Frames werden in nahezu selbsterklärender Weise dageboten
+
 
 ## Dokumentation MCAN-Bibliothek
 
@@ -143,3 +147,7 @@ void loop() {
 }
 ````
 Alernativ kann hier der Pin 2 (gemäß Arduino-Pinout) als Interrupt benutzt werden.
+
+
+# MäCAN-Weichendecoder (Magnet)
+
