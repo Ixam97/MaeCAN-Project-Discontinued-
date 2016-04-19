@@ -8,6 +8,7 @@ Hier entsteht ein System zur digitalen Steuerung einer Modellbahn, das auf dem C
 
 * [MäCAN-Bibliothek](#mäcan-bibliothek)
 * [MäCAN-Weichendecoder (Magnet)](#mäcan-weichendecoder-magnet)
+* [MäCAN-Weichendecoder (Servo)](#mäcan-weichendecoder-servo)
 
 # MäCAN-Bibliothek
 
@@ -150,5 +151,10 @@ Alernativ kann hier der Pin 2 (gemäß Arduino-Pinout) als Interrupt benutzt wer
 
 
 # MäCAN-Weichendecoder (Magnet)
+
+Der nachfolgende Teil bezieht sich ausschließlich auf die Hardware-Revision A und Software-Version 0.1. Es ist zu beachten, welche Software-Version mit welcher Hardware-Revision kompatibel ist! Alle Hardware-Versionen der gleichen Revision sind zuheinander kompatibel und unterscheiden sich nicht in ihrer Funktionsweise.
+
+
+# MäCAN-Weichendecoder (Servo)
 
 Der nachfolgende Teil bezieht sich ausschließlich auf die Hardware-Revision A und Software-Version 0.1. Es ist zu beachten, welche Software-Version mit welcher Hardware-Revision kompatibel ist! Alle Hardware-Versionen der gleichen Revision sind zuheinander kompatibel und unterscheiden sich nicht in ihrer Funktionsweise.
