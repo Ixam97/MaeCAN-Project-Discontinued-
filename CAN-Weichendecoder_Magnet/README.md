@@ -26,9 +26,13 @@ Um den Decoder in betrieb nehemn zu können, muss, wenn nicht schon geschehen, d
 
 Um den Decoder programmieren zu können muss ein Arduino (getestet mit UNO R3) als ISP programmiert werden. Dies ist mithilfe der Arduino-IDE sehr einfach.
 Dafür wird der Arduino nach erfolgreicher Installation der Arduino-IDE wie gewöhnlich per USB an den Computer angeschlossen. Nun kann in der IDE das Beispiel "ArduinoISP" ausgewählt werden:
+
 ![img1](/images/arduino-ISP_1.png)
+
 Sofern das richtige Board ausgewählt wurde kann dieser Sketch nun hochgeladen werden:
-![img2](/images/arduino-ISP_2.png) ![img3](/images/arduino-ISP_3.png)
+
+![img2](/images/arduino-ISP_2.png)
+![img3](/images/arduino-ISP_3.png)
 
 ##### Erstmaliges Flashen
 
