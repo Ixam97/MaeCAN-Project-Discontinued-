@@ -1,5 +1,5 @@
 /*
- * MäCAN-Weichendecoder V0.1, Rev A, Software-Version 0.1
+ * MäCAN-Weichendecoder V0.1, Rev A, Software-Version 0.2.1
  * 
  *  Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
  *  Do with this whatever you want, but keep thes Header and tell
@@ -13,8 +13,6 @@
  * Mögliche Protokolle:
  * Magnetartikel Motorola: MM_ACC
  * Magnetartikel NRMA-DCC: DCC_ACC
- * Gleissignal Motorola: MM_TRACK
- * Gleissignal NRMA-DCC: DCC_TRACK
  */
 #define PROTOCOL_1 DCC_ACC
 #define PROTOCOL_2 DCC_ACC
@@ -29,6 +27,13 @@
 #define ADRS_3 3
 #define ADRS_4 4
 
+/*
+ * Schaltzeit der Ausgänge in ms festlegen:
+ */
+#define SWITCHTIME 20
+#define DOUBLEFIRE false         //Zweimaliges schalten für Redundanz
+#define FEEDBACK false           //Entlagenkontrolle (NUR BEI ENDABGESCHALTETEN MAGNETANTRIEBEN VERWENDEN!)
+#define SWITCH_MODE 1            //Art der Schaltausgänge: 0: Momentkontakte; 1: Dauerkontakte
 /*
  * UID festlegen:
  */
@@ -66,43 +71,74 @@ void setup() {
 
   for(int i = 0; i < 4; i++){
     acc_state_is[i] = EEPROM.read(i);
-    //acc_state_set[i] = EEPROM.read(i); 
+    acc_state_set[i] = EEPROM.read(i); 
+  }
+
+  for(int i = 0; i < 4; i++){
+    switchAcc(i, acc_state_is[i]);
   }
 }
 
 /*
  * Funktion zum schalten der Ausgänge
- * Schalteit: 20ms
- * Jeder Ausgang wird zwei mal HIGH für doppelte Redundanz.
  */
 void switchAcc(int acc_num, bool set_state){
+  
+#if SWITCH_MODE == 0        //Momentkontakte
   if(!set_state){
     digitalWrite(acc_pin_red[acc_num], HIGH);
     digitalWrite(9,0);
-    delay(20);
+    delay(SWITCHTIME);
     digitalWrite(acc_pin_red[acc_num], LOW);
     digitalWrite(9,1);
-    delay(20);
-    digitalWrite(acc_pin_red[acc_num], HIGH);
-    digitalWrite(9,0);
-    delay(20);
-    digitalWrite(acc_pin_red[acc_num], LOW);
-    digitalWrite(9,1);
+    if(DOUBLEFIRE){
+      delay(SWITCHTIME);
+      digitalWrite(acc_pin_red[acc_num], HIGH);
+      digitalWrite(9,0);
+      delay(SWITCHTIME);
+      digitalWrite(acc_pin_red[acc_num], LOW);
+      digitalWrite(9,1);
+    }
     
   } else if (set_state){
     digitalWrite(acc_pin_grn[acc_num], HIGH);
     digitalWrite(9,0);
-    delay(20);
+    delay(SWITCHTIME);
     digitalWrite(acc_pin_grn[acc_num], LOW);
     digitalWrite(9,1);
-    delay(20);
-    digitalWrite(acc_pin_grn[acc_num], HIGH);
-    digitalWrite(9,0);
-    delay(20);
-    digitalWrite(acc_pin_grn[acc_num], LOW);
-    digitalWrite(9,1);
+    if(DOUBLEFIRE){
+      delay(SWITCHTIME);
+      digitalWrite(acc_pin_grn[acc_num], HIGH);
+      digitalWrite(9,0);
+      delay(SWITCHTIME);
+      digitalWrite(acc_pin_grn[acc_num], LOW);
+      digitalWrite(9,1);
+    }
     
   }
+  if(!FEEDBACK){
+    switchAccResponse(acc_num, set_state);
+    acc_state_is[acc_num] = set_state;
+    EEPROM.put(acc_num, acc_state_is[acc_num]);
+  }
+#else if SWITCH_MODE == 1     //Dauerkontakte
+  if(!set_state){
+    digitalWrite(acc_pin_grn[acc_num], LOW);
+    digitalWrite(9,0);
+    delay(20);
+    digitalWrite(acc_pin_red[acc_num], HIGH);
+    digitalWrite(9,1);
+  } else if(set_state){
+    digitalWrite(acc_pin_red[acc_num], LOW);
+    digitalWrite(9,0);
+    delay(20);
+    digitalWrite(acc_pin_grn[acc_num], HIGH);
+    digitalWrite(9,1);
+  }
+  switchAccResponse(acc_num, set_state);
+  acc_state_is[acc_num] = set_state;
+  EEPROM.put(acc_num, acc_state_is[acc_num]);
+#endif
 }
 
 /*
@@ -155,7 +191,7 @@ void isAccFrame(){
         //switchAcc(i, can_frame_in.data[4]);
         acc_got_cmd[i] = true;
         acc_state_set[i] = can_frame_in.data[4];
-        switchAccResponse(i, can_frame_in.data[4]);
+        //switchAccResponse(i, can_frame_in.data[4]);
         break;
       }
     }
@@ -179,11 +215,14 @@ void interruptFn(){
 
 void loop() {
   for(int i = 0; i < 4; i++){
-    if(acc_state_is[i] != digitalRead(acc_pin_rm[i])){                        //Änderungen der Weichenlage überprüfen
-      acc_state_is[i] = digitalRead(acc_pin_rm[i]);
-      if(acc_state_is[i] != acc_state_set[i]){
-         switchAccResponse(i, acc_state_is[i]);
-        acc_state_set[i] = acc_state_is[i];
+    if(FEEDBACK || !SWITCH_MODE){
+      if(acc_state_is[i] != digitalRead(acc_pin_rm[i])){                        //Änderungen der Weichenlage überprüfen
+        acc_state_is[i] = digitalRead(acc_pin_rm[i]);
+        if(acc_state_is[i] != acc_state_set[i]){
+          switchAccResponse(i, acc_state_is[i]);
+          acc_state_set[i] = acc_state_is[i];
+          EEPROM.put(i, acc_state_is[i]);
+        }
       }
     }
     if(acc_got_cmd[i]){                                                       //Nach eingegangenem Weichenbefehl schalten
