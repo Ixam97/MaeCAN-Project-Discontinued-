@@ -69,6 +69,6 @@ Hinweis: Kommt der µC schon mit einer beliebeigen Version der Decodersoftware, 
 
 Das Projekt befindet sich noch in der Entwicklungsphase, es wird also in regelmäßigen Abständen neue Softwareversionen geben. Es ist immer sinnvoll, diese möglichst bald aufzuspielen, da hier Fehler behoben werden und neue oder verbesserte Funktionen implementiert werden. Die Software, die sic im "master"-Branch befindet ist getestet und sollte sich immer problemlos einsetzen lassen.
 
-Um eine neue Software aufzuspielen muss der Sketch in der Arduino-IDE geöffnet werden sowie alle Einstellungen gemäß [Arduino als ISP](#arduinoalsisp) getätigt werden. Nachdem die [Konstanten](#konstanten) nach den eigenen Wünschen bearbeitet wurden kann die Software wie folgt hochgeladen werden:
+Um eine neue Software aufzuspielen muss der Sketch in der Arduino-IDE geöffnet werden sowie alle Einstellungen gemäß [Arduino als ISP](#arduino-als-isp) getätigt werden. Nachdem die [Konstanten](#konstanten) nach den eigenen Wünschen bearbeitet wurden kann die Software wie folgt hochgeladen werden:
 
 ![img5](/images/arduino-upload_1.png)
