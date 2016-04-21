@@ -30,6 +30,14 @@ Das Projekt ist noch im Anfangsstadium. Es ist also mit Veränderungen in relati
 * Arduino IDE
 * MäCAN Weichendecoder (Magnet) 
 
+##### Programmierkabel
+
+(kommt noch)
+
+##### Anschluss des Decoders an den Arduino
+
+(kommt noch)
+
 #### Flashen des ATMega328P
 
 Um den Decoder in betrieb nehemn zu können, muss, wenn nicht schon geschehen, die zur Hardware-Revision passende Software auf den Mikrocontroller (µC) gebrannt werden. Hierzu ist ein Arduino sowie ein passendes [Programmierkabel](#programmierkabel) notwendig.
@@ -46,6 +54,21 @@ Sofern das richtige Board ausgewählt wurde kann dieser Sketch nun hochgeladen w
 ![img2](/images/arduino-ISP_2.png)
 ![img3](/images/arduino-ISP_3.png)
 
+Nun sollte für alle weiteren Schritte als Programmer "Arduino as ISP" ausgewählt werden. Andernfalls ist ein Hochladen der Software auf den Decoder nicht möglich!
+
 ##### Erstmaliges Flashen
 
-Ist der µC fabrikneu muss zu aller erst der Arduino Bootloader auf den Chip gebrannt werden. Der Bootloader ist zwar im Betrieb nicht mehr notwendig, allerdings werden so die internen Einstellungen des µC auf die Hardware angepasst. 
+Ist der µC fabrikneu muss zu aller erst der Arduino Bootloader auf den Chip gebrannt werden. Der Bootloader ist zwar im Betrieb nicht mehr notwendig, allerdings werden so die internen Einstellungen des µC auf die Hardware angepasst.
+Sofern der Decoder richtig mit dem Arduino verbunden wurde kann mit den folgenden Einstellungen der Bootloader auf den Decoder geladen werden:
+
+![img4](/images/arduino-bootloader_1.png)
+
+Hinweis: Kommt der µC schon mit einer beliebeigen Version der Decodersoftware, so ist dieser schritt optional und für die Funktion NICHT notwendig!
+
+##### Laden einer neuen Software-Version
+
+Das Projekt befindet sich noch in der Entwicklungsphase, es wird also in regelmäßigen Abständen neue Softwareversionen geben. Es ist immer sinnvoll, diese möglichst bald aufzuspielen, da hier Fehler behoben werden und neue oder verbesserte Funktionen implementiert werden. Die Software, die sic im "master"-Branch befindet ist getestet und sollte sich immer problemlos einsetzen lassen.
+
+Um eine neue Software aufzuspielen muss der Sketch in der Arduino-IDE geöffnet werden sowie alle Einstellungen gemäß [Arduino als ISP](#arduinoalsisp) getätigt werden. Nachdem die [Konstanten](#konstanten) nach den eigenen Wünschen bearbeitet wurden kann die Software wie folgt hochgeladen werden:
+
+![img5](/images/arduino-upload_1.png)
