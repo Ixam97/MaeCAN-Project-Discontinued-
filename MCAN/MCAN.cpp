@@ -1,7 +1,9 @@
 /*
  *	Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
  *	Do with this whatever you want, but keep thes Header and tell
- *	the others what you changed!
+ *	the others what you changed1
+ *
+ *	Last changed: 2016-04-23
  */
 
 
@@ -23,35 +25,24 @@ uint16_t MCAN::generateHash(uint32_t uid){
 	return hash;
 }
 
-void MCAN::initMCAN(bool debug){
+void MCAN::initMCAN(){
 	pinMode(9,OUTPUT);
 	digitalWrite(9,0);
-	if (debug)
-	{
-		Serial.begin(250000);
-		Serial.println("MCAN started ...");
-
-		if (can.begin(CAN_250KBPS) == CAN_OK)
-		{
-			Serial.println("CAN-Initialisation successfull!");
-		} else {
-			Serial.println("CAN-Initialisation failed!");
-		}
-	}else if (can.begin(CAN_250KBPS) == CAN_OK){
+	if (can.begin(CAN_250KBPS) == CAN_OK){
 		digitalWrite(9,1);
 	}
 }
 
 void MCAN::sendCanFrame(MCANMSG can_frame){
 	uint32_t txId;
-	if ((can_frame.cmd == SWITCH_ACC) && (can_frame.resp_bit))
-	{
+	if ((can_frame.cmd == SWITCH_ACC) && (can_frame.resp_bit)){
 		txId = 0x00170000;
-	} else if ((can_frame.cmd == PING) && (can_frame.resp_bit))
-	{
+	} else if ((can_frame.cmd == SYS_CMD) && (can_frame.resp_bit)){
+		txId = 0x00010000;
+	} else if ((can_frame.cmd == PING) && (can_frame.resp_bit)){
 		txId = 0x00310000;
-	} else {
-		txId = 0x00000000;
+	} else if ((can_frame.cmd == CONFIG) && (can_frame.resp_bit)){
+		txId = 0x003b0000;
 	}
 	txId = txId | can_frame.hash;
 
@@ -66,25 +57,6 @@ MCANMSG MCAN::getCanFrame(){
 	can_frame.cmd = rxId >> 17;
 	can_frame.hash = rxId;
 	can_frame.resp_bit = bitRead(rxId, 16);
-
-	Serial.print("received Data: ");
 	
 	return can_frame;
-}
-
-void MCAN::printCanFrame(MCANMSG can_frame){
-	Serial.print(can_frame.cmd, HEX);
-	Serial.print(" ");
-	Serial.print(can_frame.resp_bit);
-	Serial.print(" ");
-	Serial.print(can_frame.hash, HEX);
-	Serial.print(" ");
-	Serial.print(can_frame.dlc);
-	for (int i = 0; i < 8; ++i)
-	{
-		Serial.print(" ");
-		Serial.print(can_frame.data[i], HEX);
-	}
-	Serial.println();
-
 }

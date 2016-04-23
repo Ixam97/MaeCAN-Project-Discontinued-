@@ -1,7 +1,9 @@
 /*
  *	Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
  *	Do with this whatever you want, but keep thes Header and tell
- *	the others what you changed!
+ *	the others what you changed1
+ *
+ *	Last changed: 2016-04-23
  */
 
 
@@ -23,10 +25,11 @@
  	#define SYS_STOP 	0x00 	//System - Stopp
  	#define SYS_GO		0x01	//System - Go
  	#define SYS_HALT	0x02	//System - Halt
+ 	#define SYS_STAT	0x0b	//System - Status (sendet geänderte Konfiguration)
 #define SWITCH_ACC 	0x0b	//Magnetartikel Schalten
 #define S88_EVENT	0x11	//Rückmelde-Event
 #define PING 		0x18	//CAN-Teilnehmer anpingen
-
+#define CONFIG		0x1d	//Konfiguration
 
 typedef struct {
 	uint8_t cmd;
@@ -40,10 +43,9 @@ typedef struct {
 class MCAN{
 public:
 	uint16_t generateHash(uint32_t uid);
-	void initMCAN(bool debug);
+	void initMCAN();
 	void sendCanFrame(MCANMSG can_frame);
 	MCANMSG getCanFrame();
-	void printCanFrame(MCANMSG can_frame);
 private:
 };
 
