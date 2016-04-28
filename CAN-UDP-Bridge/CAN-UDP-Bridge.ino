@@ -34,8 +34,8 @@ typedef struct {
 MCP_CAN CAN(15);
 WiFiUDP UDP;
 
-const char* ssid = "SlowRotkohl";
-const char* password = "Hackbraten";
+const char* ssid = "#######";
+const char* password = "########";
 
 byte udpRxBuf[13];
 byte udpTxBuf[13];
