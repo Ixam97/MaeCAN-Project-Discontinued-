@@ -28,14 +28,24 @@ typedef struct {
 #define INT 2     //Interrupt-Pin
 #define CS 15     //Chip-Select-Pin
 
-#define PORT_LISTEN 15730
-#define PORT_SENDTO 15731
+#define MODE 0       //Betriebsart: 0: An dem Tragbaren Gerät; 1: An der Gleisbox
+
+
+#if MODE == 0
+#define PORT_LISTEN 15732
+#define PORT_SENDTO 15733
+
+#else if MODE == 1
+#define PORT_LISTEN 15731
+#define PORT_SENDTO 15730
+
+#endif
 
 MCP_CAN CAN(15);
 WiFiUDP UDP;
 
-const char* ssid = "#######";
-const char* password = "########";
+const char* ssid = "SlowRotkohl";
+const char* password = "Hackbraten";
 
 byte udpRxBuf[13];
 byte udpTxBuf[13];
@@ -43,16 +53,16 @@ byte udpTxBuf[13];
 CANBUF canTxBuf;
 CANBUF canRxBuf;
 
-IPAddress broadcast(255,255,255,255);
+IPAddress broadcast(192,168,1,128);
 
-void canToUdp(CANBUF canBuf){
-  udpTxBuf[4] = canBuf.dlc;
-  udpTxBuf[3] = canBuf.id;
-  udpTxBuf[2] = canBuf.id >> 8;
-  udpTxBuf[1] = canBuf.id >> 16;
-  udpTxBuf[0] = canBuf.id >> 24;
+void canToUdp(){
+  udpTxBuf[4] = canRxBuf.dlc;
+  udpTxBuf[3] = canRxBuf.id;
+  udpTxBuf[2] = canRxBuf.id >> 8;
+  udpTxBuf[1] = canRxBuf.id >> 16;
+  udpTxBuf[0] = canRxBuf.id >> 24;
   for(int i = 0; i < 8; i++){
-    udpTxBuf[5+i] = canBuf.data[i];
+    udpTxBuf[5+i] = canRxBuf.data[i];
   }
   Serial.print("CAN -> UDP :: ID: ");
   for(int i = 0; i < 4; i++){
@@ -74,12 +84,12 @@ void canToUdp(CANBUF canBuf){
   Serial.print("\r\n");
 }
 
-CANBUF udpToCan(){
+void udpToCan(){
   CANBUF canBuf;
-  canBuf.dlc = udpRxBuf[4];
-  canBuf.id = (udpRxBuf[0] << 24) | (udpRxBuf[1] << 16) | (udpRxBuf[2] << 8) | udpRxBuf[3];
+  canTxBuf.dlc = udpRxBuf[4];
+  canTxBuf.id = (udpRxBuf[0] << 24) | (udpRxBuf[1] << 16) | (udpRxBuf[2] << 8) | udpRxBuf[3];
   for(int i = 0; i < 8; i++){
-    canBuf.data[i] = udpRxBuf[5+i];
+    canTxBuf.data[i] = udpRxBuf[5+i];
   }
   Serial.print("UDP -> CAN :: ID: ");
   for(int i = 0; i < 4; i++){
@@ -101,25 +111,26 @@ CANBUF udpToCan(){
   Serial.print("\r\n");
 }
 
-void sendCan(CANBUF canBuf){
-  CAN.sendMsgBuf(canBuf.id, 1, canBuf.dlc, canBuf.data);
+void sendCan(){
+  CAN.sendMsgBuf(canTxBuf.id, 1, canTxBuf.dlc, canTxBuf.data);
 }
 
-CANBUF getCan(){
-  CANBUF canBuf;
-  CAN.readMsgBuf(&canBuf.dlc, canBuf.data);
-  canBuf.id = CAN.getCanId();
+void getCan(){
+  CAN.readMsgBuf(&canRxBuf.dlc, canRxBuf.data);
+  canRxBuf.id = CAN.getCanId();
 }
 
-void sendUdp(byte udpBuf[13]){
+void sendUdp(){
   UDP.beginPacket(broadcast, PORT_SENDTO);
-  UDP.write(udpBuf, 13);
+  UDP.write(udpTxBuf, 13);
   UDP.endPacket();
   
 }
 
 void getUdp(){
-  UDP.read(udpRxBuf, 13);
+  for(int i = 0; i < 13; i++){
+    udpRxBuf[i] = UDP.read();
+  }
   UDP.flush();
   
 }
@@ -167,16 +178,17 @@ void setup() {
 
 void loop() {
   if(!digitalRead(INT)){
-    canRxBuf = getCan();
-    canToUdp(canRxBuf);
-    sendUdp(udpTxBuf);
+    Serial.println("recieved CAN-packet...");
+    getCan();
+    canToUdp();
+    sendUdp();
   }
 
-  int udpPacketSize = UDP.parsePacket();
-  if(udpPacketSize){
+  if(UDP.parsePacket()){
+    Serial.println("recieved UDP-packet...");
     getUdp();
-    canTxBuf = udpToCan();
-    sendCan(canTxBuf);
+    udpToCan();
+    sendCan();
   }
 
 }
