@@ -12,6 +12,7 @@
 #include <WiFiClientSecure.h>
 #include <WiFiServer.h>
 #include <WiFiUdp.h>
+#include <ESP8266WebServer.h>
 
 typedef struct {
   uint32_t id;
@@ -36,15 +37,17 @@ typedef struct {
 #define PORT_SENDTO 15733
 
 #else if MODE == 1
-#define PORT_LISTEN 15731
-#define PORT_SENDTO 15730
+#define PORT_LISTEN 15733
+#define PORT_SENDTO 15732
 
 #endif
+
+ESP8266WebServer server(80);
 
 MCP_CAN CAN(15);
 WiFiUDP UDP;
 
-const char* ssid = "SlowRotkohl";
+const char* ssid = "ESP8266";
 const char* password = "Hackbraten";
 
 byte udpRxBuf[13];
@@ -54,6 +57,10 @@ CANBUF canTxBuf;
 CANBUF canRxBuf;
 
 IPAddress broadcast(192,168,1,128);
+
+void handleRoot() {
+  server.send(200, "text/html", "<h1>MS2-WiFi Access Point</h1>");
+}
 
 void canToUdp(){
   udpTxBuf[4] = canRxBuf.dlc;
@@ -123,21 +130,12 @@ void getCan(){
 void sendUdp(){
   UDP.beginPacket(broadcast, PORT_SENDTO);
   UDP.write(udpTxBuf, 13);
-  UDP.endPacket();
-  
-}
-
-void getUdp(){
-  for(int i = 0; i < 13; i++){
-    udpRxBuf[i] = UDP.read();
-  }
-  UDP.flush();
-  
+  UDP.endPacket();  
 }
 
 void setup() {
   //CAN-Bus initialisieren:
-  Serial.begin(9600);
+  Serial.begin(250000);
   Serial.print("\r\n\r\n");
   Serial.print("Starting CAN-UDP-Bridge ...\r\n");
   Serial.print("Initialising CAN ... ");
@@ -147,7 +145,7 @@ void setup() {
     Serial.print("failed!\r\n");
     while(1);
   }
-  
+#if MODE == 0
   //Mit dem WiFi verbinden:
   Serial.print("Connecting to '");
   Serial.print(ssid);
@@ -162,6 +160,16 @@ void setup() {
   Serial.print(WiFi.localIP());
   Serial.print("\r\n");
 
+#else if MODE == 1
+  WiFi.softAP(ssid);
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
+  server.on("/", handleRoot);
+  server.begin();
+  Serial.println("HTTP server started");
+
+#endif
+    
   //UDP-Socket öffnen:
   Serial.print("Opening UDP-socket on port ");
   Serial.print(PORT_LISTEN);
@@ -177,16 +185,21 @@ void setup() {
 }
 
 void loop() {
+#if MODE == 1
+  server.handleClient();
+#endif
+  
   if(!digitalRead(INT)){
-    Serial.println("recieved CAN-packet...");
     getCan();
     canToUdp();
     sendUdp();
   }
-
-  if(UDP.parsePacket()){
-    Serial.println("recieved UDP-packet...");
-    getUdp();
+  
+  int packetsize = UDP.parsePacket();
+  if(packetsize){
+    for(int i = 0; i < 13; i++){
+      udpRxBuf[i] = UDP.read();
+    }
     udpToCan();
     sendCan();
   }
