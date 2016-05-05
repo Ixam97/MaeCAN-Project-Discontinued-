@@ -15,7 +15,7 @@ Die MCAN-Bibliothek dient dazu, eine einfache Möglichkeit zu haben, auf den Mä
   * [MCANMSG](#mcanmsg)
 * [Funktionen](#funktionen)
   * [generateHash(uid)](#generatehashuid)
-  * [initMCAN(debug)](#initmcandebug)
+  * [initMCAN()](#initmcan)
   * [sendCanFrame(can_frame)](#sendcanframecan_frame)
   * [getCanFrame()](#getcanframe)
 
@@ -100,10 +100,9 @@ hash = 0x474C
 ````
 Weitere Informationen zum Hash und dessen berechnung sind [Hier](http://medienpdb.maerklin.de/digital22008/files/cs2CAN-Protokoll-2_0.pdf) unter dem Punkt "1.2.4 Hash" zu finden.
 
-###### initMCAN(debug)
+###### initMCAN()
 
 Diese Funktion initialisiert den CAN-Controller.
-Der Parameter "debug" aktiviert bzw. deaktiviert die Ausgabe von Informationen über die Serielle Schnittstelle des Arduini/µC. Mögliche Werte sind "true" und "false".
 
 Beispiel:
 ````
@@ -112,7 +111,7 @@ Beispiel:
 MCAN mcan;
 
 void setup() {
-  mcan.initMCAN(false);
+  mcan.initMCAN();
 }
 ````
 
@@ -134,7 +133,7 @@ MCANMSG can_frame_in;
 
 void setup() {
   pinMode(2, INPUT);
-  mcan.initMCAN(false);
+  mcan.initMCAN();
 }
 void loop() {
   if(!digitalRead(2)) can_frame_in = mcan.getCanFrame();
