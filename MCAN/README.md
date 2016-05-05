@@ -36,6 +36,7 @@ Die folgenden Konstanten werden in der Bibliothek definiert und können nach Bed
  SWITCH_ACC 	0x0b	//Magnetartikel Schalten
  S88_EVENT	0x11	//Rückmelde-Event
  PING 		0x18	//CAN-Teilnehmer anpingen
+ CONFIG		0x1d	//Konfiguration
 ````
 
 ###### Protokolle
