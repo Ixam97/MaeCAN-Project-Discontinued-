@@ -6,6 +6,14 @@ Das Projekt ist noch im Anfangsstadium. Es ist also mit Veränderungen in relati
 
 ## Changelog
 
+##### V0.4
+
+ + Es kann nun ein manueller Modus ausgewählt werden, falls keine Möglichkeit besteht, die Benutzeroberfläche der CS2 zu benutzen. Hierfür müssen alle Einstellungsparameter im Sketch selber geändert werden (siehe Dokumentation [kommt noch])!
+
+##### V0.3
+
+ + Die Einstellungen (Adressen, Protokolle, Schaltzeit, Lageerkennung, Dauer- oder Momentkontakt) lassen sich nun (ausschließlich) über die Benutzeroberfläche der CS2 konfigurieren.
+
 ##### V0.2.1
 
 + Der Decoder behält nun seinen letzten Schaltzustand bei und führt diesen bei jedem Einschalten erneut aus.
