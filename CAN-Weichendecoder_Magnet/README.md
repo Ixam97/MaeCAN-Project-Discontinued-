@@ -40,7 +40,7 @@ Das Projekt ist noch im Anfangsstadium. Es ist also mit Veränderungen in relati
 
 ##### Programmierkabel
 
-(kommt noch)
+Um den Decoder programmieren zu können ist es erforderlich diesen mit einem speziellen Programmierkabel mit einem Arduino zu verbinden. Dafür wird die ICSP-Schnittstelle auf der Platine des Decoders Verwendet. Die Pinbelegung entspricht dabei dem Standard: (WIP)
 
 ##### Anschluss des Decoders an den Arduino
 
