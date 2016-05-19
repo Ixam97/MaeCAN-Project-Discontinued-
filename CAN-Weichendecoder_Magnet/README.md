@@ -28,8 +28,9 @@ Das Projekt ist noch im Anfangsstadium. Es ist also mit Veränderungen in relati
 
 #### Inhalt
 
-* [Das wird benötigt](#daswirdbenötigt)
+* [Das wird benötigt](#das-wird-benötigt)
 * [Flashen des ATMega328P](#flashen-des-atmega328p)
+* [Konfoguration des Decoders](#konfiguration-des-decoders)
 
 #### Das wird benötigt
 
@@ -77,6 +78,12 @@ Hinweis: Kommt der µC schon mit einer beliebeigen Version der Decodersoftware, 
 
 Das Projekt befindet sich noch in der Entwicklungsphase, es wird also in unregelmäßigen Abständen neue Softwareversionen geben. Es ist immer sinnvoll, diese möglichst bald aufzuspielen, da hier Fehler behoben werden und neue oder verbesserte Funktionen implementiert werden. Die Software, die sic im "master"-Branch befindet ist getestet und sollte sich immer problemlos einsetzen lassen.
 
-Um eine neue Software aufzuspielen muss der Sketch in der Arduino-IDE geöffnet werden sowie alle Einstellungen gemäß [Arduino als ISP](#arduino-als-isp) getätigt werden. Nachdem die [Konstanten](#konstanten) nach den eigenen Wünschen bearbeitet wurden kann die Software wie folgt hochgeladen werden:
+Um eine neue Software aufzuspielen muss der Sketch in der Arduino-IDE geöffnet werden sowie alle Einstellungen gemäß [Arduino als ISP](#arduino-als-isp) getätigt werden. Die Software kann wie folgt hochgeladen werden:
 
 ![img5](/images/arduino-upload_1.png)
+
+### Konfiguration des Decoders
+
+Um Konfigurationswerte des Decoders (z.B. Adrssen, Protokolle etc) einstellen zu können gibt es zwei Möglichkeiten. Hierfür muss die Konstante "MANUAL-MODE" wie folgt gesetzt werden:
+* Echtzeitkonfiguration mit einer CS2(.exe) -> false
+* Feste Programmierung im Sketch -> true
