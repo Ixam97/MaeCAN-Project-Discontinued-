@@ -22,4 +22,8 @@ Um die Arduino-IDE kompatibel zu machen muss wie folgt vorgegangen werden:
 * in das Feld "Zusätzliche Boardverwallter-URLs:" den Link "http://arduino.esp8266.com/stable/package_esp8266com_index.json" eintragen,
 * Werkzeuge -> Board: "..." -> Boardverwallter ... öffnen und hier nach "esp8266" suchen und anschließend installieren.
 
-Nun kann das Board wie jede andere unter Werkzeuge ausgewählt werden.
+Nun kann das Board wie jedes andere unter Werkzeuge ausgewählt werden.
+
+
+
+Fortsetzung folgt ...
