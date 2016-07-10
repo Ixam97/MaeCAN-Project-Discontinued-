@@ -33,8 +33,8 @@ typedef struct {
 
 
 #if MODE == 0
-#define PORT_LISTEN 15732
-#define PORT_SENDTO 15733
+#define PORT_LISTEN 15733
+#define PORT_SENDTO 15734
 
 #else if MODE == 1
 #define PORT_LISTEN 15733
@@ -47,7 +47,7 @@ ESP8266WebServer server(80);
 MCP_CAN CAN(15);
 WiFiUDP UDP;
 
-const char* ssid = "ESP8266";
+const char* ssid = "SlowRotkohl";
 const char* password = "Hackbraten";
 
 byte udpRxBuf[13];
@@ -133,6 +133,12 @@ void sendUdp(){
   UDP.endPacket();  
 }
 
+void interruptFn(){
+    getCan();
+    canToUdp();
+    sendUdp();
+}
+
 void setup() {
   //CAN-Bus initialisieren:
   Serial.begin(250000);
@@ -149,7 +155,7 @@ void setup() {
   //Mit dem WiFi verbinden:
   Serial.print("Connecting to '");
   Serial.print(ssid);
-  Serial.print("' ");
+  //Serial.print("' ");
   WiFi.begin(ssid, password);
   while(WiFi.status() != WL_CONNECTED){
     delay(500);
@@ -182,18 +188,14 @@ void setup() {
   }
   pinMode(INT, INPUT);
 
+  attachInterrupt(INT, interruptFn, LOW);
+
 }
 
 void loop() {
 #if MODE == 1
   server.handleClient();
 #endif
-  
-  if(!digitalRead(INT)){
-    getCan();
-    canToUdp();
-    sendUdp();
-  }
   
   int packetsize = UDP.parsePacket();
   if(packetsize){
