@@ -8302,7 +8302,6 @@ wave soldering</description>
 <part name="Q3" library="semicon-smd-ipc" deviceset="NPN-TRANSISTOR_" device="SOT23"/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0805" value="12k"/>
 <part name="R3" library="rcl" deviceset="R-EU_" device="R0805" value="12k"/>
-<part name="P+4" library="supply1" deviceset="+5V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -8347,7 +8346,6 @@ wave soldering</description>
 <instance part="Q3" gate="G$1" x="193.04" y="5.08" rot="R270"/>
 <instance part="R1" gate="G$1" x="208.28" y="10.16" rot="R180"/>
 <instance part="R3" gate="G$1" x="208.28" y="22.86" rot="R180"/>
-<instance part="P+4" gate="1" x="220.98" y="35.56"/>
 </instances>
 <busses>
 </busses>
@@ -8480,12 +8478,6 @@ wave soldering</description>
 <wire x1="96.52" y1="27.94" x2="109.22" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="109.22" y1="27.94" x2="109.22" y2="48.26" width="0.1524" layer="91"/>
 <pinref part="P+3" gate="1" pin="+5V"/>
-</segment>
-<segment>
-<pinref part="PROG" gate="G$1" pin="4"/>
-<wire x1="223.52" y1="15.24" x2="220.98" y2="15.24" width="0.1524" layer="91"/>
-<wire x1="220.98" y1="15.24" x2="220.98" y2="33.02" width="0.1524" layer="91"/>
-<pinref part="P+4" gate="1" pin="+5V"/>
 </segment>
 </net>
 <net name="+18V" class="0">
