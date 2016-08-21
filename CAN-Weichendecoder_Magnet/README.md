@@ -34,22 +34,28 @@ Das Projekt ist noch im Anfangsstadium. Es ist also mit Veränderungen in relati
 
 #### Das wird benötigt
 
-* Arduino (getestet mit UNO R3)
+* Arduino (getestet mit UNO R3 und NANO)
 * Passendes Programmierkabel
 * Arduino IDE
 * MäCAN Weichendecoder (Magnet) 
 
 ##### Programmierkabel
 
-Um den Decoder programmieren zu können ist es erforderlich diesen mit einem speziellen Programmierkabel mit einem Arduino zu verbinden. Dafür wird die ICSP-Schnittstelle auf der Platine des Decoders Verwendet. Die Pinbelegung entspricht dabei dem Standard: (WIP)
+Um den Decoder programmieren zu können ist es erforderlich diesen mit einem Programmierkabel mit einem Arduino zu verbinden (hierfür reichen einfache Jumper-Kabel). Dafür wird die ICSP-Schnittstelle auf der Platine des Decoders Verwendet. Die Pinbelegung entspricht dabei dem Standard:
+![img_icsp](https://sysexit.files.wordpress.com/2013/02/icsp_pinout1.png)
+
+Pin 1 ist sowohl auf dem Arduino als auch auf dem Decoder mit einem kleinen Punkt markiert oder einer der anderen Pins ist mit einer Zahl breschriftet.
 
 ##### Anschluss des Decoders an den Arduino
 
-(kommt noch)
+Um nun Arduino und Decoder miteinander zu verbinden müssen die beiden Header jeweils 1:1 miteinander verbunden werden (also Pin 1 an Pin 1, Pin 2 an Pin 2 usw.). Einzige Ausnahme ist Pin 5 (RST / Reset). Dieser muss mit dem I/O-Pin 10 (bzw. dem Pin, der im ArduinoISP-Sketch festgelegt wird) des Arduinos verbunden werden. Nun sollte seitens der Hardware alles für das Programmieren vorbereitet sein.
+Weiteres zur ICSP-Schnittstelle findet sich auch im Kopfbereich des ArduinoISP-Sketches, den man wie unter [Arduino als ISP](#arduino-als-isp) findet.
 
 #### Flashen des ATMega328P
 
 Um den Decoder in betrieb nehemn zu können, muss, wenn nicht schon geschehen, die zur Hardware-Revision passende Software auf den Mikrocontroller (µC) gebrannt werden. Hierzu ist ein Arduino sowie ein passendes [Programmierkabel](#programmierkabel) notwendig.
+
+**HINWEIS: Wird der Decoder programmiert darf keine externe Spannung an den Eingängen des Decoders anliegen! Andernfalls können Decoder und/oder Arduino zerstört werden!**
 
 ##### Arduino als ISP
 
@@ -81,6 +87,10 @@ Das Projekt befindet sich noch in der Entwicklungsphase, es wird also in unregel
 Um eine neue Software aufzuspielen muss der Sketch in der Arduino-IDE geöffnet werden sowie alle Einstellungen gemäß [Arduino als ISP](#arduino-als-isp) getätigt werden. Die Software kann wie folgt hochgeladen werden:
 
 ![img5](/images/arduino-upload_1.png)
+
+##### Nach dem Flashen
+
+Wurde der Decoder erfollgreich mit einer neuen Softwareversion bespielt sollte (sofern die Hardware richtig verbaut wurde und funktionsfähig ist) direkt nach Abschluss des Vorgangs die Grüne LED aufleuchten. Diese signalisiert, dass der CAN-Bus erfolgreich initialisiert wurde. Wenn nun Steuersignale an den Decoder gesendet werden, die auch an ihn adressiert sind, erlischt die LED für einen kurzen Augenblick.
 
 ### Konfiguration des Decoders
 
