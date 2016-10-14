@@ -1,34 +1,37 @@
 #######################################
-# Syntax Coloring Map For debug_lvc
-#######################################
-
-#######################################
 # Datatypes (KEYWORD1)
 #######################################
-MCANMSG	KEYWORD1
-MCAN	KEYWORD1
+MCANMSG		KEYWORD3
+MCAN		KEYWORD1
+CanDevice	KEYWORD3
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-generateHash	KEYWORD2
-initMCAN		KEYWORD2
-sendCanFrame	KEYWORD2
-getCanFrame		KEYWORD2
+generateHash		KEYWORD2
+initMCAN			KEYWORD2
+sendCanFrame		KEYWORD2
+getCanFrame			KEYWORD2
+sendDeviceInfo  	KEYWORD2
+sendConfigInfoDropdown	KEYWORD2
+sendConfigInfoSlider	KEYWORD2
+sendPingResponse 	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
-SYS_CMD		LITERAL1
-SYS_GO		LITERAL1
-SYS_STOP	LITERAL1
-SYS_HALT	LITERAL1
-SYS_STAT	LIBERAL1
-SWITCH_ACC	LITERAL1
-PING		LITERAL1
-S88_EVENT	LITERAL1
-MM_ACC		LITERAL1
-MM_TRACK	LITERAL1
-DCC_ACC		LITERAL1
-DCC_TRACK	LITERAL1
-CONFIG		LITERAL1
+SYS_CMD		LITERAL1	
+SYS_GO		LITERAL1	
+SYS_STOP	LITERAL1	
+SYS_HALT	LITERAL1	
+SYS_STAT	LITERAL1	
+SWITCH_ACC	LITERAL1	
+PING		LITERAL1	
+S88_EVENT	LITERAL1	
+MM_ACC		LITERAL1	
+MM_TRACK	LITERAL1	
+DCC_ACC		LITERAL1	
+DCC_TRACK	LITERAL1	
+CONFIG		LITERAL1	
+MCAN_MAGNET	LITERAL1	
+MCAN_SERVO	LITERAL1	
