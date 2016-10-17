@@ -1,9 +1,10 @@
 /*
  *	Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
+ *  If you need Help, feel free to contact me any time!
  *	Do with this whatever you want, but keep thes Header and tell
- *	the others what you changed1
+ *	the others what you changed!
  *
- *	Last changed: 2016-10-14
+ *	Last changed: 2016-10-17
  */
 
 
@@ -13,23 +14,25 @@
 
 MCP_CAN can(10);
 
-uint32_t rxId;
-
 uint16_t MCAN::generateHash(uint32_t uid){
+
 	uint16_t highbyte = uid >> 16;
 	uint16_t lowbyte = uid;
 	uint16_t hash = highbyte ^ lowbyte;
 	bitWrite(hash, 7, 0);
 	bitWrite(hash, 8, 1);
 	bitWrite(hash, 9, 1);
+
 	return hash;
 }
 
 uint16_t MCAN::generateLocId(uint16_t prot, uint16_t adrs){
+
 	return (prot + adrs - 1);
 }
 
 void MCAN::initMCAN(bool debug){
+
 	if(debug) Serial.begin(250000);
 	pinMode(9,OUTPUT);
 	digitalWrite(9,0);
@@ -39,6 +42,7 @@ void MCAN::initMCAN(bool debug){
 	}
 }
 void MCAN::initMCAN(){
+
 	pinMode(9,OUTPUT);
 	digitalWrite(9,0);
 	if (can.begin(CAN_250KBPS) == CAN_OK){
@@ -47,11 +51,13 @@ void MCAN::initMCAN(){
 }
 
 void MCAN::sendCanFrame(MCANMSG can_frame){
+
 	uint32_t txId = can_frame.cmd;
 	txId = (txId << 17) | can_frame.hash;
 	bitWrite(txId, 16, can_frame.resp_bit);
 
 	can.sendMsgBuf(txId, 1, can_frame.dlc, can_frame.data);
+	Serial.println(canFrameToString(can_frame, 1));
 }
 
 void MCAN::sendDeviceInfo(CanDevice device, int configNum){
@@ -61,32 +67,23 @@ void MCAN::sendDeviceInfo(CanDevice device, int configNum){
 	MCANMSG can_frame;
 	int frameCounter = 0;
 
-	uint8_t buffer[8] = {0, configNum, 0, 0, 0, 0, 0, device.boardNum};
 	can_frame.cmd = CONFIG;
 	can_frame.resp_bit = 1;
 	can_frame.dlc = 8;
-	for(int i = 0; i < 8; i++){
-		can_frame.data[i] = buffer[i];
-	}
+	for(int i = 0; i < 8; i++){can_frame.data[i] = 0;}
+	can_frame.data[1] = configNum;
+	can_frame.data[7] = device.boardNum;
 	can_frame.hash = 0x0301;
 
 	sendCanFrame(can_frame);
 	frameCounter++;
-	Serial.println(can_frame.hash, HEX);
 
+	for(int i = 0; i < 8; i++) { can_frame.data[i] = 0; }
+	device.artNum.getBytes(can_frame.data,8);
 
-	for(int i = 0; i < 8; i++){
-		buffer[i] = 0;
-	}
-	device.artNum.getBytes(buffer,8);
-	for(int i = 0; i < 8; i++){
-		can_frame.data[i] = buffer[i];
-	}
-	can_frame.hash = 0x0302;
-
+	can_frame.hash++;
 	sendCanFrame(can_frame);
 	frameCounter++;
-	Serial.println(can_frame.hash, HEX);
 
 	int nameLen = device.name.length();
 	int neededFrames;
@@ -99,17 +96,11 @@ void MCAN::sendDeviceInfo(CanDevice device, int configNum){
 			if((8*i)+j < nameLen) can_frame.data[j] = device.name[(8*i)+j];
 			else can_frame.data[j] = 0;
 		}
-		can_frame.hash = 0x0303 + i;
-
+		can_frame.hash++;
 		sendCanFrame(can_frame);
 		frameCounter++;
-	Serial.println(can_frame.hash, HEX);
 	}
 
-
-	for(int i = 0; i < 8; i++){
-		buffer[i] = 0;
-	}
 	can_frame.hash = device.hash;
 	can_frame.dlc = 6;
 	can_frame.data[0] = device.uid >> 24;
@@ -120,7 +111,6 @@ void MCAN::sendDeviceInfo(CanDevice device, int configNum){
 	can_frame.data[5] = frameCounter;
 
 	sendCanFrame(can_frame);
-	Serial.println(can_frame.hash, HEX);
 }
 
 void MCAN::sendConfigInfoDropdown(CanDevice device, uint8_t configChanel, uint8_t numberOfOptions, uint8_t defaultSetting, String settings){
@@ -145,7 +135,6 @@ void MCAN::sendConfigInfoDropdown(CanDevice device, uint8_t configChanel, uint8_
 	sendCanFrame(can_frame);
 	can_frame.hash++;
 	frameCounter++;
-	Serial.println(frameCounter);
 
 	//Frames, die Strings enthalten:
 
@@ -164,7 +153,6 @@ void MCAN::sendConfigInfoDropdown(CanDevice device, uint8_t configChanel, uint8_
 		sendCanFrame(can_frame);
 		can_frame.hash++;
 		frameCounter++;
-		Serial.println(frameCounter);
 	}
 
 	//Abschließender bestätigungsframe:
@@ -181,7 +169,7 @@ void MCAN::sendConfigInfoDropdown(CanDevice device, uint8_t configChanel, uint8_
 	sendCanFrame(can_frame);
 }
 
-void MCAN::sendConfigInfoSlider(CanDevice device, uint8_t configChanel, uint32_t lowerValue, uint32_t upperValue, uint32_t defaultValue, String settings){
+void MCAN::sendConfigInfoSlider(CanDevice device, uint8_t configChanel, uint16_t lowerValue, uint16_t upperValue, uint16_t defaultValue, String settings){
 	MCANMSG can_frame;
 	int frameCounter;
 
@@ -223,7 +211,6 @@ void MCAN::sendConfigInfoSlider(CanDevice device, uint8_t configChanel, uint32_t
 		sendCanFrame(can_frame);
 		can_frame.hash++;
 		frameCounter++;
-		Serial.println(frameCounter);
 	}
 
 	//Abschließender bestätigungsframe:
@@ -240,10 +227,11 @@ void MCAN::sendConfigInfoSlider(CanDevice device, uint8_t configChanel, uint32_t
 	sendCanFrame(can_frame);
 }
 
-void MCAN::sendPingResponse(CanDevice device){
+void MCAN::sendPingFrame(CanDevice device, bool response){
 	MCANMSG can_frame;
 	can_frame.cmd = PING;
-	can_frame.resp_bit = 1;
+	can_frame.hash = device.hash;
+	can_frame.resp_bit = response;
 	can_frame.dlc = 8;
 	can_frame.data[0] = device.uid >> 24;
 	can_frame.data[1] = device.uid >> 16;
@@ -255,10 +243,32 @@ void MCAN::sendPingResponse(CanDevice device){
 	can_frame.data[7] = device.type;
 
 	sendCanFrame(can_frame);
-	Serial.println("Sent ping response...");
+}
+
+void MCAN::sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool response){
+
+	MCANMSG can_frame;
+
+	can_frame.cmd = SWITCH_ACC;
+	can_frame.resp_bit = response;
+	can_frame.hash = device.hash;
+	can_frame.dlc = 6;
+	can_frame.data[0] = 0;
+	can_frame.data[1] = 0;
+	can_frame.data[2] = locId >> 8;
+	can_frame.data[3] = locId;
+	can_frame.data[4] = state;
+	can_frame.data[5] = 0;
+
+	sendCanFrame(can_frame);
+
+	can_frame.data[4] = 0xfe - state;
+
+	sendCanFrame(can_frame);
 }
 
 MCANMSG MCAN::getCanFrame(){
+	uint32_t rxId;
 
 	MCANMSG can_frame;
 	can.readMsgBuf(&can_frame.dlc, can_frame.data);
@@ -266,6 +276,56 @@ MCANMSG MCAN::getCanFrame(){
 	can_frame.cmd = rxId >> 17;
 	can_frame.hash = rxId;
 	can_frame.resp_bit = bitRead(rxId, 16);
+
+	//Serial.println(canFrameToString(can_frame, 0));
 	
 	return can_frame;
+}
+
+int MCAN::checkAccessoryFrame(MCANMSG can_frame, uint16_t locIds[], int accNum, bool response){
+
+	uint16_t currentLocId = (can_frame.data[2] << 8) | can_frame.data[3];
+
+	if((can_frame.cmd == SWITCH_ACC) || (can_frame.resp_bit == response)){
+		for( int i = 0; i < accNum; i++){
+			if(currentLocId == locIds[i]) return i;
+		}
+	}
+
+	return -1;
+}
+
+void MCAN::saveConfigData(MCANMSG can_frame, uint8_t memory[]){
+
+	int chanel = can_frame.data[5] - 1;
+
+	memory[chanel*2] = can_frame.data[6];
+	memory[(chanel*2) + 1] = can_frame.data[7];
+}
+
+String MCAN::canFrameToString(MCANMSG can_frame, bool direction){
+
+	String direction_s;
+	String cmd = String(can_frame.cmd, HEX);
+	String hash = String(can_frame.hash, HEX);
+
+	if(can_frame.cmd < 0x10) cmd = String("0x0" + cmd);
+	else cmd = String("0x" + cmd);
+
+	if(can_frame.hash < 0x10) hash = String("0x000" + hash);
+	else if (can_frame.hash < 0x100) hash = String("0x00" + hash);
+	else if (can_frame.hash < 0x1000) hash = String("0x0" + hash);
+	else hash = String("0x" + hash);
+
+	String data;
+	for(int i = 0; i < can_frame.dlc; i++){
+		String byte_s = String(can_frame.data[i], HEX);
+		if(can_frame.data[i] < 0x10) data = String(data + " 0x0" + byte_s);
+		else data = String(data + " 0x" + byte_s);
+	}
+
+	if(!direction) direction_s = "IN:  ";
+	else direction_s = "OUT: ";
+
+	return (String(direction_s + cmd + " Response: " + can_frame.resp_bit + " Hash: " + hash + " DLC: " + can_frame.dlc + " Data:" + data));
 }

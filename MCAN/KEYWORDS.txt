@@ -8,14 +8,17 @@ CanDevice	KEYWORD3
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-generateHash		KEYWORD2
-initMCAN			KEYWORD2
-sendCanFrame		KEYWORD2
-getCanFrame			KEYWORD2
-sendDeviceInfo  	KEYWORD2
+generateHash			KEYWORD2
+initMCAN				KEYWORD2
+sendCanFrame			KEYWORD2
+getCanFrame				KEYWORD2
+sendDeviceInfo  		KEYWORD2
 sendConfigInfoDropdown	KEYWORD2
 sendConfigInfoSlider	KEYWORD2
-sendPingResponse 	KEYWORD2
+sendPingResponse 		KEYWORD2
+checkAccessoryFrame		KEYWORD2
+sendAccessoryFrame		KEYWORD2
+sendPingFrame			KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
