@@ -1,10 +1,10 @@
 /*
- *	Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
+ *  Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
  *  If you need Help, feel free to contact me any time!
- *	Do with this whatever you want, but keep thes Header and tell
- *	the others what you changed!
+ *  Do with this whatever you want, but keep thes Header and tell
+ *  the others what you changed!
  *
- *	Last changed: 2016-10-17
+ *  Last changed: 2016-10-17
  */
 
 
