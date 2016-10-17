@@ -3,7 +3,7 @@
 Die MCAN-Bibliothek dient dazu, eine einfache Möglichkeit zu haben, auf den Märklin CAN-Bus zuzugreifen. Dabei ist es nicht notwendig irgendwelche Berechnungen durchzuführen. Die CAN-Frames werden in nahezu selbsterklärender Weise dageboten
 
 
-## Dokumentation MCAN-Bibliothek
+## Dokumentation MCAN-Bibliothek (Veraltet, wird demnächst aktualisiert)
 
 #### Inhalt
 
