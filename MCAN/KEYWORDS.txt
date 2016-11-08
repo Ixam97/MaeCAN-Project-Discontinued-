@@ -19,6 +19,7 @@ sendPingResponse 		KEYWORD2
 checkAccessoryFrame		KEYWORD2
 sendAccessoryFrame		KEYWORD2
 sendPingFrame			KEYWORD2
+saveConfigData			KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

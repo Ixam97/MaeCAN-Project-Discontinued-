@@ -73,7 +73,7 @@ public:
 	 *  Funktion: Local-ID aus der Adresse und dem Protokoll berechnen.
 	 *  Parameter: Protokollbasis (siehe hoben), Adresse
 	 ******************************************************************************/			
-	uint16_t generateLocId(uint16_t prot, uint16_t adrs);	
+	uint16_t generateLocId(uint16_t prot, uint16_t adrs);
 
 	/******************************************************************************
 	 *  Name: initMCAN
@@ -150,9 +150,19 @@ public:
 
 	/******************************************************************************
 	 *  Name: saveConfigData
-	 *  NOCH NICHT FERTIG!
+	 *  Funktion: Speichert empfangene Einstelungen im EEPROM ab (Kanal 1: Register
+	 *            0 und 1, Kanal 2: Register 2 und 3 usw...), sofern an das Gerät 
+	 *            gerichtet.
+	 *  Parameter: Geräteinformationen, CAN-Nachricht.
 	 ******************************************************************************/
-	void saveConfigData(MCANMSG can_frame, uint8_t memory[]);
+	void saveConfigData(CanDevice device, MCANMSG can_frame);
+
+	/******************************************************************************
+	 *  Name: getConfigDataFromEEPROM
+	 *  Funktion: Liest einen Konfigurationskanal aus dem EEPROM.
+	 *  Parameter: Konfigurationskanal.
+	 ******************************************************************************/
+	uint16_t getConfigDataFromEEPROM(int chanel);
 
 	/******************************************************************************
 	 *  Name: canFrameToString

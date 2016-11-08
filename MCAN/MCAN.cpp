@@ -11,6 +11,7 @@
 #include <Arduino.h>
 #include <MCAN.h>
 #include "mcp_can.h"
+#include <EEPROM.h>
 
 MCP_CAN can(10);
 
@@ -27,6 +28,9 @@ uint16_t MCAN::generateHash(uint32_t uid){
 }
 
 uint16_t MCAN::generateLocId(uint16_t prot, uint16_t adrs){
+
+	if(prot == 0) prot = DCC_ACC;
+	if(prot == 1) prot = MM_ACC;
 
 	return (prot + adrs - 1);
 }
@@ -277,7 +281,7 @@ MCANMSG MCAN::getCanFrame(){
 	can_frame.hash = rxId;
 	can_frame.resp_bit = bitRead(rxId, 16);
 
-	//Serial.println(canFrameToString(can_frame, 0));
+	Serial.println(canFrameToString(can_frame, false));
 	
 	return can_frame;
 }
@@ -295,12 +299,31 @@ int MCAN::checkAccessoryFrame(MCANMSG can_frame, uint16_t locIds[], int accNum, 
 	return -1;
 }
 
-void MCAN::saveConfigData(MCANMSG can_frame, uint8_t memory[]){
+void MCAN::saveConfigData(CanDevice device, MCANMSG can_frame){
 
 	int chanel = can_frame.data[5] - 1;
 
-	memory[chanel*2] = can_frame.data[6];
-	memory[(chanel*2) + 1] = can_frame.data[7];
+	Serial.println("Saving Config Data...");
+
+	//EEPROM.put((chanel*2), can_frame.data[6]);
+	//EEPROM.put((chanel*2) + 1, can_frame.data[7]);
+
+	MCANMSG can_frame_out;
+
+	can_frame_out.cmd = SYS_CMD;
+	can_frame_out.hash = device.hash;
+	can_frame_out.resp_bit = true;
+	can_frame_out.dlc = 7;
+	for(int i = 0; i < 6; i++){ can_frame_out.data[i] = can_frame.data[i];}
+	can_frame_out.data[6] = 1;
+	can_frame_out.data[7] = 0;
+
+	sendCanFrame(can_frame_out);
+}
+
+uint16_t MCAN::getConfigDataFromEEPROM(int chanel){
+	chanel--;
+	return (EEPROM.read((chanel*2) << 8) + EEPROM.read((chanel*2) + 1));
 }
 
 String MCAN::canFrameToString(MCANMSG can_frame, bool direction){
