@@ -233,3 +233,15 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.dri
+*.GBL
+*.GBO
+*.GTS
+*.GTO
+*.GBP
+*.GML
+*.GTP
+*.gpi
+*.GBS
+*.GTL
+*.TXT
