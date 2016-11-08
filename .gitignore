@@ -1,21 +1,4 @@
-#################
-## Eagle/Gerber
-#################
 
-.b#*
-.s#*
-.dri
-.GBL
-.GBO
-.GBP
-.GBS
-.GML
-.gpi
-.GTL
-.GTO
-.GTP
-.GTS
-.TXT
 
 #################
 ## Eclipse
