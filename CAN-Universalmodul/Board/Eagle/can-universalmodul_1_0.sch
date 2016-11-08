@@ -9637,6 +9637,7 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <part name="JP3" library="jumper" deviceset="JP1E" device=""/>
 <part name="JP4" library="jumper" deviceset="JP1E" device=""/>
 <part name="X4" library="con-jst" deviceset="?4B-ZR" device="B"/>
+<part name="SV3" library="con-lstb" deviceset="MA04-1" device="" value="Serial"/>
 </parts>
 <sheets>
 <sheet>
@@ -9710,6 +9711,7 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <instance part="X4" gate="-2" x="353.06" y="22.86"/>
 <instance part="X4" gate="-3" x="353.06" y="20.32"/>
 <instance part="X4" gate="-4" x="353.06" y="17.78"/>
+<instance part="SV3" gate="1" x="251.46" y="53.34" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -10050,6 +10052,11 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <wire x1="215.9" y1="86.36" x2="215.9" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="GND6" gate="1" pin="GND"/>
 </segment>
+<segment>
+<pinref part="SV3" gate="1" pin="4"/>
+<wire x1="243.84" y1="50.8" x2="241.3" y2="50.8" width="0.1524" layer="91"/>
+<label x="241.3" y="50.8" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
 </net>
 <net name="RESET" class="0">
 <segment>
@@ -10068,6 +10075,11 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <pinref part="SV1" gate="1" pin="5"/>
 <wire x1="15.24" y1="20.32" x2="12.7" y2="20.32" width="0.1524" layer="91"/>
 <label x="12.7" y="20.32" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="SV3" gate="1" pin="1"/>
+<wire x1="243.84" y1="58.42" x2="241.3" y2="58.42" width="0.1524" layer="91"/>
+<label x="241.3" y="58.42" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="CS" class="0">
@@ -10189,6 +10201,11 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <label x="266.7" y="68.58" size="1.27" layer="95" rot="R270" xref="yes"/>
 <pinref part="SV4" gate="G$1" pin="3"/>
 </segment>
+<segment>
+<pinref part="SV3" gate="1" pin="2"/>
+<wire x1="243.84" y1="55.88" x2="241.3" y2="55.88" width="0.1524" layer="91"/>
+<label x="241.3" y="55.88" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
 </net>
 <net name="7" class="0">
 <segment>
@@ -10211,6 +10228,11 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <wire x1="264.16" y1="73.66" x2="264.16" y2="68.58" width="0.1524" layer="91"/>
 <label x="264.16" y="68.58" size="1.27" layer="95" rot="R270" xref="yes"/>
 <pinref part="SV4" gate="G$1" pin="4"/>
+</segment>
+<segment>
+<pinref part="SV3" gate="1" pin="3"/>
+<wire x1="243.84" y1="53.34" x2="241.3" y2="53.34" width="0.1524" layer="91"/>
+<label x="241.3" y="53.34" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="6" class="0">

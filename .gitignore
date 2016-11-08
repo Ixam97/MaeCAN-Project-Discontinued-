@@ -228,5 +228,5 @@ pip-log.txt
 *.GBS
 *.GTL
 *.TXT
-*.s#1
-*.b#1
+*.s#*
+*.b#*
