@@ -274,7 +274,7 @@ void setup_acc() {
 void change_prot(){
   for(int i = 0; i < NUM_ACCs; i++) {
     acc_articles[i].locID = (EEPROM.read( acc_articles[i].reg_locid ) << 8) | (EEPROM.read( acc_articles[i].reg_locid + 1 ));
-    uint16_t adrsss = mcan.getadrs(prot_old, acc_articles[ config_index - start_adrs_channel ].locID);
+    uint16_t adrsss = mcan.getadrs(prot_old, acc_articles[i].locID);
     acc_articles[i].locID = mcan.generateLocId(prot, adrsss );
     byte locid_high = acc_articles[i].locID >> 8;
     byte locid_low = acc_articles[i].locID;
