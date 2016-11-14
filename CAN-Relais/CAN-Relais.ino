@@ -6,7 +6,7 @@
  *  Do with this whatever you want, but keep thes Header and tell
  *  the others what you changed!
  *
- *  Last edited: 2016-11-12
+ *  Last edited: 2016-11-14
  */
 
 /******************************************************************************
@@ -62,7 +62,7 @@
 //#define MCAN_S88_GBS 0x0054
 
 const uint8_t USE_ONBOARD = 1;       // On-Board Ausgänge benutzen: 0 = Nein; 1 = Ja
-const uint8_t ANZ_ADDONS  = 8;       // Anzahl AddOn Platinen (max 8)
+const uint8_t ANZ_ADDONS  = 2;       // Anzahl AddOn Platinen (max 8)
 const uint8_t ANZ_ACC_PER_ADDON = 8; // Anzahl an Ausgängen pro AddOn Platine: Default = 8
                                       // => Relais = 8
                                       // => Weichen = 8
@@ -103,6 +103,8 @@ unsigned long currentMillis = 0;
 const long interval = 1000;
 bool state_LED = false;
 
+//#define DEBUG
+
 /******************************************************************************
  * Variablen der Magnetartikel:
  ******************************************************************************/
@@ -129,6 +131,9 @@ CanDevice device;
  * Setup
  ******************************************************************************/
 void setup() {
+  #ifdef DEBUG
+    Serial.begin(9600);
+  #endif
   uid_mat[0] = UID >> 24;
   uid_mat[1] = UID >> 16;
   uid_mat[2] = UID >> 8;
@@ -136,6 +141,9 @@ void setup() {
 
   if( (EEPROM.read(1)==uid_mat[0]) && (EEPROM.read(2)==uid_mat[1]) && (EEPROM.read(3)==uid_mat[2]) && (EEPROM.read(4)==uid_mat[3]) ){
   } else {
+    #ifdef DEBUG
+      Serial.print("Initital Setup of EEPROM");
+    #endif
     EEPROM.put(0, 0);
     EEPROM.put(1, uid_mat[0]);
     EEPROM.put(2, uid_mat[1]);
@@ -145,6 +153,9 @@ void setup() {
     EEPROM.put(REG_SWITCHTIME, (switchtime >> 8));
     EEPROM.put(REG_SWITCHTIME+1, switchtime);
     EEPROM.put(REG_PROT, 1);    // 0 = DCC, 1=MM
+    #ifdef DEBUG
+      Serial.println("...completed.");
+    #endif
   }
 
   pinMode(9, OUTPUT);
@@ -179,10 +190,22 @@ void setup() {
 
   setup_acc();
 
+  #ifdef DEBUG
+    Serial.print("Initial CAN-Bus");
+  #endif
   mcan.initMCAN();
   attachInterrupt(digitalPinToInterrupt(2), interruptFn, LOW);
+  #ifdef DEBUG
+    Serial.println("...completed.");
+  #endif
+
   state_LED = 1;
   digitalWrite(9,state_LED);
+  #ifdef DEBUG
+    Serial.println("Setup completed.");
+    Serial.println("Device is now ready...");
+    Serial.println("-----------------------------------");
+  #endif
 
 }
 
@@ -190,6 +213,9 @@ void setup() {
  * Setup Funktion zum Einrichten der ACCs
  */
 void setup_acc() {
+  #ifdef DEBUG
+    Serial.print("Setting up Accs");
+  #endif
   // setup mainboard pins
   int num = 0;
   if(USE_ONBOARD == 1){
@@ -264,6 +290,9 @@ void setup_acc() {
       EEPROM.put(acc_articles[i].reg_locid + 1, locid_low);
     }
   }
+  #ifdef DEBUG
+    Serial.println("...completed");
+  #endif
   signal_setup_successfull();
 
 }
@@ -281,6 +310,7 @@ void change_prot(){
     EEPROM.put(acc_articles[i].reg_locid, locid_high);
     EEPROM.put(acc_articles[i].reg_locid + 1, locid_low);
   }
+  signal_setup_successfull();
 
 }
 
@@ -388,6 +418,13 @@ void switchAcc(int acc_num, bool set_state){
         AddOn[acc_articles[acc_num].Modul-1].digitalWrite(pin, LOW);
         digitalWrite(9,1);
       }
+      #ifdef DEBUG
+        Serial.print("Switching (impulse) ACC-No. ");
+        Serial.print(mcan.getadrs(prot, acc_articles[acc_num].locID));
+        Serial.print(" on modul ");
+        Serial.print(acc_articles[acc_num].Modul);
+        Serial.println(" to RED.");
+      #endif
     } else if (set_state){            // grün
       if(acc_articles[acc_num].Modul == 0){
         digitalWrite(acc_articles[acc_num].pin_grn, HIGH);
@@ -403,6 +440,13 @@ void switchAcc(int acc_num, bool set_state){
         AddOn[acc_articles[acc_num].Modul-1].digitalWrite(pin, LOW);
         digitalWrite(9,1);
       }
+      #ifdef DEBUG
+        Serial.print("Switching (impulse) ACC-No. ");
+        Serial.print(mcan.getadrs(prot, acc_articles[acc_num].locID));
+        Serial.print(" on modul ");
+        Serial.print(acc_articles[acc_num].Modul);
+        Serial.println(" to GREEN.");
+      #endif
     }
 
   }else if(switchmode){          //0 = Moment; 1 = Dauer
@@ -422,6 +466,13 @@ void switchAcc(int acc_num, bool set_state){
         AddOn[acc_articles[acc_num].Modul-1].digitalWrite(pin, HIGH);
         digitalWrite(9,1);
       }
+      #ifdef DEBUG
+        Serial.print("Switching (permanent) ACC-No. ");
+        Serial.print(mcan.getadrs(prot, acc_articles[acc_num].locID));
+        Serial.print(" on modul ");
+        Serial.print(acc_articles[acc_num].Modul);
+        Serial.println(" to RED.");
+      #endif
     } else if(set_state){             // grün
       if(acc_articles[acc_num].Modul == 0){
         digitalWrite(acc_articles[acc_num].pin_red, LOW);
@@ -438,6 +489,14 @@ void switchAcc(int acc_num, bool set_state){
         AddOn[acc_articles[acc_num].Modul-1].digitalWrite(pin, HIGH);
         digitalWrite(9,1);
       }
+      #ifdef DEBUG
+        Serial.print("Switching (permanent) ACC-No. ");
+        Serial.print(mcan.getadrs(prot, acc_articles[acc_num].locID));
+        Serial.print(" on modul ");
+        Serial.print(acc_articles[acc_num].Modul);
+        Serial.println(" to GREEN.");
+      #endif
+
     }
   }
   digitalWrite(9,0);
@@ -468,9 +527,16 @@ void interruptFn(){
 void accFrame(){
   if((can_frame_in.cmd == SWITCH_ACC) && (can_frame_in.resp_bit == 0)){     //Abhandlung bei gültigem Weichenbefehl
     uint16_t locid = (can_frame_in.data[2] << 8) | can_frame_in.data[3];
+    #ifdef DEBUG
+      Serial.print("Recieved ACC-Frame for ACC: ");
+      Serial.println(mcan.getadrs(prot, locid));
+    #endif
     for(int i = 0; i < NUM_ACCs; i++){
       if(locid == acc_articles[i].locID){                                              //Auf benutzte Adresse überprüfen
         acc_articles[i].state_set = can_frame_in.data[4];
+        #ifdef DEBUG
+          Serial.println(" => match found -> Set state.");
+        #endif
         break;
       }
     }
@@ -484,6 +550,9 @@ void accFrame(){
 void pingFrame(){
   if((can_frame_in.cmd == PING) && (can_frame_in.resp_bit == 0)){          //Auf Ping Request antworten
     mcan.sendPingFrame(device, true);
+    #ifdef DEBUG
+      Serial.println("Sending ping response.");
+    #endif
   }
 
 }
@@ -497,6 +566,9 @@ void configFrame(){
     if((uid_mat[0] == can_frame_in.data[0])&&(uid_mat[1] == can_frame_in.data[1])&&(uid_mat[2] == can_frame_in.data[2])&&(uid_mat[3] == can_frame_in.data[3])){
       config_poll = true;
       config_index = can_frame_in.data[4];
+      #ifdef DEBUG
+        Serial.println("Recieved config frame.");
+      #endif
     }
   }
 
@@ -517,6 +589,12 @@ void statusFrame(){
         }
         if(prot != prot_old){
           EEPROM.put(REG_PROT, can_frame_in.data[7]);
+          #ifdef DEBUG
+            Serial.print("Changing protocol: ");
+            Serial.print(prot_old);
+            Serial.print(" -> ");
+            Serial.println(prot);
+          #endif
           change_prot();
         }
         mcan.statusResponse(device, can_frame_in.data[5]);
@@ -526,15 +604,27 @@ void statusFrame(){
         EEPROM.put(REG_SWITCHTIME+1, can_frame_in.data[7]);
         switchtime = (can_frame_in.data[6] << 8) | can_frame_in.data[6];
         mcan.statusResponse(device, can_frame_in.data[5]);
+        #ifdef DEBUG
+          Serial.print("Changing switchtime: ");
+          Serial.println(switchtime);
+        #endif
 
       } else if(can_frame_in.data[5] >= start_adrs_channel){
         if(can_frame_in.data[5] == acc_articles[can_frame_in.data[5]-start_adrs_channel].adrs_channel){
+          #ifdef DEBUG
+            Serial.print("Changing address: ");
+            Serial.print(mcan.getadrs(prot, acc_articles[can_frame_in.data[5]-start_adrs_channel].locID));
+            Serial.print(" -> ");
+          #endif
           acc_articles[can_frame_in.data[5]-start_adrs_channel].locID = mcan.generateLocId(prot, (can_frame_in.data[6] << 8) | can_frame_in.data[7] );
           byte locid_high = acc_articles[can_frame_in.data[5]-start_adrs_channel].locID >> 8;
           byte locid_low = acc_articles[can_frame_in.data[5]-start_adrs_channel].locID;
           EEPROM.put(acc_articles[can_frame_in.data[5]-start_adrs_channel].reg_locid, locid_high);
           EEPROM.put(acc_articles[can_frame_in.data[5]-start_adrs_channel].reg_locid + 1, locid_low);
           mcan.statusResponse(device, can_frame_in.data[5]);
+          #ifdef DEBUG
+            Serial.println(mcan.getadrs(prot, acc_articles[can_frame_in.data[5]-start_adrs_channel].locID));
+          #endif
 
         }
       }
@@ -555,7 +645,6 @@ void loop() {
     attachInterrupt(digitalPinToInterrupt(2), interruptFn, LOW);
   }
   */
-
   currentMillis = millis();
   if(currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
@@ -567,6 +656,15 @@ void loop() {
   for(int i = 0; i < NUM_ACCs; i++){
     if(acc_articles[i].state_is != acc_articles[i].state_set){
       switchAcc(i, acc_articles[i].state_set);
+      #ifdef DEBUG
+        Serial.print("Switching ACC ");
+        Serial.print(mcan.getadrs(prot, acc_articles[i].locID));
+        if(acc_articles[i].state_set == 0){
+          Serial.println(" to RED.");
+        } else {
+          Serial.println(" to GREEN.");
+        }
+      #endif
     }
   }
 
