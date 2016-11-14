@@ -266,13 +266,14 @@ void MCAN::sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool
 	can_frame.data[2] = locId >> 8;
 	can_frame.data[3] = locId;
 	can_frame.data[4] = state;
-	can_frame.data[5] = 0;
+	can_frame.data[5] = 1;		//old value: 0
 
 	sendCanFrame(can_frame);
-
+/*
 	can_frame.data[4] = 0xfe - state;
 
 	sendCanFrame(can_frame);
+*/
 }
 
 MCANMSG MCAN::getCanFrame(){
