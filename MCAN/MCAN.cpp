@@ -35,6 +35,10 @@ uint16_t MCAN::generateLocId(uint16_t prot, uint16_t adrs){
 	return (prot + adrs - 1);
 }
 
+uint16_t MCAN::getadrs(uint16_t prot, uint16_t locid){
+  return (locid + 1 - prot);
+}
+
 void MCAN::initMCAN(bool debug){
 
 	if(debug) Serial.begin(250000);
@@ -262,13 +266,14 @@ void MCAN::sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool
 	can_frame.data[2] = locId >> 8;
 	can_frame.data[3] = locId;
 	can_frame.data[4] = state;
-	can_frame.data[5] = 0;
+	can_frame.data[5] = 1;		//old value: 0
 
 	sendCanFrame(can_frame);
-
+/*
 	can_frame.data[4] = 0xfe - state;
 
 	sendCanFrame(can_frame);
+*/
 }
 
 MCANMSG MCAN::getCanFrame(){
@@ -282,7 +287,7 @@ MCANMSG MCAN::getCanFrame(){
 	can_frame.resp_bit = bitRead(rxId, 16);
 
 	Serial.println(canFrameToString(can_frame, false));
-	
+
 	return can_frame;
 }
 
@@ -324,6 +329,25 @@ void MCAN::saveConfigData(CanDevice device, MCANMSG can_frame){
 uint16_t MCAN::getConfigDataFromEEPROM(int chanel){
 	chanel--;
 	return (EEPROM.read((chanel*2) << 8) + EEPROM.read((chanel*2) + 1));
+}
+
+void MCAN::statusResponse(CanDevice device, int chanel){
+	MCANMSG can_frame_out;
+
+  can_frame_out.cmd = SYS_CMD;
+  can_frame_out.hash = device.hash;
+  can_frame_out.resp_bit = true;
+  can_frame_out.dlc = 7;
+  can_frame_out.data[0] = device.uid >> 24;
+  can_frame_out.data[1] = device.uid >> 16;
+  can_frame_out.data[2] = device.uid >> 8;
+  can_frame_out.data[3] = device.uid;
+  can_frame_out.data[4] = SYS_STAT;
+  can_frame_out.data[5] = chanel;
+  can_frame_out.data[6] = true;
+  can_frame_out.data[7] = 0;
+
+  sendCanFrame(can_frame_out);
 }
 
 String MCAN::canFrameToString(MCANMSG can_frame, bool direction){

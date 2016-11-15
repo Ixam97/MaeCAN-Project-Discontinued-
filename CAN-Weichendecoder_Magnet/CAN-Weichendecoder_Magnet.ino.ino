@@ -1,11 +1,11 @@
 /*
- * MäCAN-Weichendecoder Rev A, Software-Version 0.4
- * 
+ * MäCAN-Weichendecoder Rev A, Software-Version 0.4.1
+ *
  *  Created by Maximilian Goldschmidt <maxigoldschmidt@gmail.com>
  *  Do with this whatever you want, but keep thes Header and tell
  *  the others what you changed!
- *  
- *  Last edited: 2016-05-11
+ *
+ *  Last edited: 2016-11-12
  */
 
 #define MANUAL_MODE false   //Programmierung über CS2 (false) oder direkt im Sketch (true)
@@ -19,13 +19,13 @@
  #define ADRS_3 3
  #define ADRS_4 4
 
- #define PROT_1 DCC_ACC     
+ #define PROT_1 DCC_ACC
  #define PROT_3 DCC_ACC
  #define PROT_3 DCC_ACC
  #define PROT_4 DCC_ACC
 
  #define SWITCHTIME 200     //Schaltzeit in ms (20 bis 1000)
- #define STWITCHMODE 0      //0 = Moment; 1 = Dauer
+ #define SWITCHMODE 0      //0 = Moment; 1 = Dauer
  #define FEEDBACK true
 
 /*
@@ -104,19 +104,19 @@ void setup() {
   byte locid_2_low = locid_2;
   EEPROM.put(reg_locid[1],locid_2_high);
   EEPROM.put(reg_locid[1] + 1, locid_2_low);
-  
+
   uint16_t locid_3 = PROT_3 + ADRS_3 - 1;
   byte locid_3_high = locid_3 >> 8;
   byte locid_3_low = locid_3;
-  EEPROM.put(reg_locid[0],locid_3_high);
-  EEPROM.put(reg_locid[0] + 1, locid_3_low);
-  
+  EEPROM.put(reg_locid[2],locid_3_high);
+  EEPROM.put(reg_locid[2] + 1, locid_3_low);
+
   uint16_t locid_4 = PROT_4 + ADRS_4 - 1;
   byte locid_4_high = locid_4 >> 8;
   byte locid_4_low = locid_4;
-  EEPROM.put(reg_locid[0],locid_4_high);
-  EEPROM.put(reg_locid[0] + 1, locid_4_low);
-  
+  EEPROM.put(reg_locid[3],locid_4_high);
+  EEPROM.put(reg_locid[3] + 1, locid_4_low);
+
   #endif
 
   uid_mat[0] = UID >> 24;
@@ -136,7 +136,7 @@ void setup() {
 
   for(int i = 0; i < 4; i++){
     acc_state_is[i] = EEPROM.read(0xa0 + i);
-    acc_state_set[i] = EEPROM.read(0xa0 + i); 
+    acc_state_set[i] = EEPROM.read(0xa0 + i);
   }
 
   for(int i = 0; i < 4; i++){
@@ -156,7 +156,7 @@ void switchAcc(int acc_num, bool set_state){
   bool switchmode = EEPROM.read(0);
   bool feedback = EEPROM.read(1);
   uint16_t switchtime = (EEPROM.read(2) << 8) | EEPROM.read(3);
-  
+
 if(!switchmode){
   if(!set_state){
     digitalWrite(acc_pin_red[acc_num], HIGH);
@@ -164,14 +164,14 @@ if(!switchmode){
     delay(switchtime);
     digitalWrite(acc_pin_red[acc_num], LOW);
     digitalWrite(9,1);
-    
+
   } else if (set_state){
     digitalWrite(acc_pin_grn[acc_num], HIGH);
     digitalWrite(9,0);
     delay(switchtime);
     digitalWrite(acc_pin_grn[acc_num], LOW);
     digitalWrite(9,1);
-    
+
   }
   if(feedback == 0){
     digitalWrite(9,0);
@@ -216,13 +216,13 @@ void switchAccResponse(int acc_num, bool set_state){
   can_frame_out.data[5] = 0;
 
   mcan.sendCanFrame(can_frame_out);
-  
+
   can_frame_out.data[4] = 0xfe - set_state;     /* Meldung für CdB-Module und Rocrail Feldereignisse. */
-  
+
   mcan.sendCanFrame(can_frame_out);
 }
 
-void accFrame(){  
+void accFrame(){
   if((can_frame_in.cmd == SWITCH_ACC) && (can_frame_in.resp_bit == 0)){     //Abhandlung bei gültigem Weichenbefehl
     uint16_t locid = (can_frame_in.data[2] << 8) | can_frame_in.data[3];
     for(int i = 0; i < 4; i++){
@@ -236,7 +236,7 @@ void accFrame(){
   }
 }
 
-void pingFrame(){  
+void pingFrame(){
   if((can_frame_in.cmd == PING) && (can_frame_in.resp_bit == 0)){          //Auf Ping Request antworten
     pingResponse();
   }
@@ -322,12 +322,12 @@ void statusResponse(int chanel){
   can_frame_out.data[5] = chanel;
   can_frame_out.data[6] = true;
   can_frame_out.data[7] = 0;
-  
+
   mcan.sendCanFrame(can_frame_out);
 }
 
 void sendConfig(int index){
-  
+
   byte config_len[] = {4,4,4,4,5,5,5,5,5,5,5,5};
   byte config_frames[][10][8] = {{
       {0,CONFIG_NUM,0,0,0,0,0,BOARD_NUM},
@@ -398,14 +398,14 @@ void sendConfig(int index){
       {'4',0,'1',0,'2','0','4','8'},
       {0,0,0,0,0,0,0,0}
     }};
-  
+
   for(int i = 0; i < config_len[index]; i++){
     configDataFrame(config_frames[index][i], i);
   }
   configTerminator(index, config_len[index]);
 }
 
-void configDataFrame(uint8_t config_data[8], int framecount){  
+void configDataFrame(uint8_t config_data[8], int framecount){
   can_frame_out.cmd = CONFIG;
   can_frame_out.hash = 0x300 | framecount + 1;
   can_frame_out.resp_bit = true;
@@ -417,7 +417,7 @@ void configDataFrame(uint8_t config_data[8], int framecount){
   mcan.sendCanFrame(can_frame_out);
 
   delay(5);
-  
+
 }
 
 void configTerminator(int channel, int framecount){
@@ -450,10 +450,10 @@ void interruptFn(){
 }
 
 void loop() {
-  
+
   bool switchmode = EEPROM.read(0);
   bool feedback = EEPROM.read(1);
-  
+
   for(int i = 0; i < 4; i++){
     if((feedback == 1) && (switchmode == 0)){
       if(acc_state_is[i] != digitalRead(acc_pin_rm[i])){                        //Änderungen der Weichenlage überprüfen
@@ -470,11 +470,9 @@ void loop() {
       acc_got_cmd[i] = false;
     }
   }
-  
+
   if(config_poll){
     config_poll = false;
     sendConfig(config_index);
   }
 }
-
-

@@ -17,14 +17,17 @@
  */
 #define MCAN_MAGNET	0x0050
 #define MCAN_SERVO 	0x0051
+#define MCAN_RELAIS	0x0052
+#define MCAN_STELLPULT 0x0053
+#define MCAN_S88_GBS 0x0054
 
 
 /*
  *  Adressbereich der Local-IDs:
  */
-#define MM_ACC 		0x3000	//Magnetartikel Motorola
-#define DCC_ACC 	0x3800	//Magbetartikel NRMA_DCC
-#define MM_TRACK 	0x0000	//Gleissignal Motorola
+#define MM_ACC 		  0x3000	//Magnetartikel Motorola
+#define DCC_ACC 	  0x3800	//Magbetartikel NRMA_DCC
+#define MM_TRACK 	  0x0000	//Gleissignal Motorola
 #define DCC_TRACK 	0xC000	//Gleissignal NRMA_DCC
 
 /*
@@ -37,66 +40,73 @@
  	#define SYS_STAT	0x0b	//System - Status (sendet geänderte Konfiguration oder übermittelt Messwerte)
 #define SWITCH_ACC 	0x0b	//Magnetartikel Schalten
 #define S88_EVENT	0x11	//Rückmelde-Event
-#define PING 		0x18	//CAN-Teilnehmer anpingen
+#define PING 		  0x18	//CAN-Teilnehmer anpingen
 #define CONFIG		0x1d	//Konfiguration
 
 typedef struct {
 	uint8_t cmd;			//CAN-Befehl (siehe oben)
-	uint16_t hash;			//zuvor mit generateHash berechneter Hash
-	bool resp_bit;			//gesetztes oder nicht gesetztes Response Bit
+	uint16_t hash;		//zuvor mit generateHash berechneter Hash
+	bool resp_bit;		//gesetztes oder nicht gesetztes Response Bit
 	uint8_t dlc;			//Anzahl der Datenbytes
-	uint8_t data[8];		//Datenbytes
+	uint8_t data[8];	//Datenbytes
 } MCANMSG;
 
 typedef struct {
 	uint8_t versHigh;		//Versionsnummer vor dem Punkt
 	uint8_t versLow;		//Versionsnummer nach dem Punkt
-	String name;			//Name des Geräts
+	String name;			  //Name des Geräts
 	String artNum;			//Artikelnummer des Geräts
-	int boardNum;			//Nummer des Geräts
+	int boardNum;			  //Nummer des Geräts
 	uint16_t hash;			//Hash des Geräts (muss vor her mit generateHash() berechnet werden)
-	uint32_t uid;			//UID des Geräts
+	uint32_t uid;			  //UID des Geräts
 	uint16_t type;			//Typ des Geräts (z.B. MäCAN Magnetartikeldecoder: 0x0050)
 } CanDevice;
 
 class MCAN{
 public:
 	/******************************************************************************
-	 *  Name: generateHash		
+	 *  Name: generateHash
 	 *  Funktion: Hash aus der UID berechnen
 	 *  Parameter: zuvor festgelegte UID (auf der Anlage einzigartig!)
 	 ******************************************************************************/
-	uint16_t generateHash(uint32_t uid);			
+	uint16_t generateHash(uint32_t uid);
 
 	/******************************************************************************
-	 *  Name: generateLocId	
+	 *  Name: generateLocId
 	 *  Funktion: Local-ID aus der Adresse und dem Protokoll berechnen.
 	 *  Parameter: Protokollbasis (siehe hoben), Adresse
-	 ******************************************************************************/			
+	 ******************************************************************************/
 	uint16_t generateLocId(uint16_t prot, uint16_t adrs);
+
+  /******************************************************************************
+	 *  Name: getadrs
+	 *  Funktion: Adress aus der Local-ID und dem Protokoll berechnen.
+	 *  Parameter: Protokollbasis (siehe hoben), Local-ID
+	 ******************************************************************************/
+  uint16_t getadrs(uint16_t prot, uint16_t locid);
 
 	/******************************************************************************
 	 *  Name: initMCAN
 	 *  Funktion: Initialisiert den CAN-Bus mit allen spezifischen Einstellungen
 	 *  Parameter: keiner oder "true", um den Debug-Modus zu nutzen.
-	 ******************************************************************************/	
-	void initMCAN();											
-	void initMCAN(bool debug);									
+	 ******************************************************************************/
+	void initMCAN();
+	void initMCAN(bool debug);
 
 	/******************************************************************************
 	 *  Name: sendCanFrame
 	 *  Funktion: Versendet eine CAN-Nachricht über den Bus (siehe MCANMSG)
 	 *  Parameter: CAN-Nachricht (MCANMSG)
 	 ******************************************************************************/
-	void sendCanFrame(MCANMSG can_frame);						
+	void sendCanFrame(MCANMSG can_frame);
 
 	/******************************************************************************
 	 *  Name: sendDeviceInfo
-	 *  Funktion: Übertragt Gerateinformationen (CanDevice, siehe oben) an die 
+	 *  Funktion: Übertragt Gerateinformationen (CanDevice, siehe oben) an die
 	 *            Zentrale. Antwort auf Konfig-kanal 0.
 	 *  Parameter: Geräteinformationen (CanDevice), Anzahl der Konfig-Kanäle.
 	 ******************************************************************************/
-	void sendDeviceInfo(CanDevice device, int configNum);		//IMMER Kanal 0!				
+	void sendDeviceInfo(CanDevice device, int configNum);		//IMMER Kanal 0!
 
 	/******************************************************************************
 	 *  Name: sendConfigDropdown
@@ -120,14 +130,14 @@ public:
 	 *  Funktion: Sendet eine Pinganfrage oder -antwort.
 	 *  Parameter: Geräteinformationen, Anfrage (false) oder Antwort (true).
 	 ******************************************************************************/
-	void sendPingFrame(CanDevice device, bool response);	
+	void sendPingFrame(CanDevice device, bool response);
 
 	/******************************************************************************
 	 *  Name: sendAccessoryFrame
 	 *  Funktion: Sendet einen Schaltauftrag oder die Antwort auf einen.
 	 *  Parameter: Geräteinformationen, Local-ID des zu schaltenden Zubehörs,
 	 *             Zustand des Zubehörs, Auftrag (false) oder Antwort (true).
-	 ******************************************************************************/	
+	 ******************************************************************************/
 	void sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool response);
 
 	/******************************************************************************
@@ -135,7 +145,7 @@ public:
 	 *  Funktion: Liest eine CAN-Nachricht aus falls verfügbar (Interrupt LOW).
 	 *  Rückgabe: CAN-Nachricht (MCANMSG).
 	 ******************************************************************************/
-	MCANMSG getCanFrame();										
+	MCANMSG getCanFrame();
 
 	/******************************************************************************
 	 *  Name: checkAccessoryFrame
@@ -151,7 +161,7 @@ public:
 	/******************************************************************************
 	 *  Name: saveConfigData
 	 *  Funktion: Speichert empfangene Einstelungen im EEPROM ab (Kanal 1: Register
-	 *            0 und 1, Kanal 2: Register 2 und 3 usw...), sofern an das Gerät 
+	 *            0 und 1, Kanal 2: Register 2 und 3 usw...), sofern an das Gerät
 	 *            gerichtet.
 	 *  Parameter: Geräteinformationen, CAN-Nachricht.
 	 ******************************************************************************/
@@ -164,10 +174,17 @@ public:
 	 ******************************************************************************/
 	uint16_t getConfigDataFromEEPROM(int chanel);
 
+  /******************************************************************************
+	 *  Name: statusResponse
+	 *  Funktion: Sendet Antwort auf Konfigurationskanal
+	 *  Parameter: Konfigurationskanal
+	 ******************************************************************************/
+  void statusResponse(CanDevice device, int chanel);
+
 	/******************************************************************************
 	 *  Name: canFrameToString
 	 *  Funktion: Generiert aus einer CAN-Nachricht einen lesbaren String.
-	 *  Parameter: CAN-Nachricht, eingehende (false) oder ausgehende (true) 
+	 *  Parameter: CAN-Nachricht, eingehende (false) oder ausgehende (true)
 	 *             Nachricht.
 	 *  Rückgabe: Lesbarer String.
 	 ******************************************************************************/
