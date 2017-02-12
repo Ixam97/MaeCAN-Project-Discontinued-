@@ -5,7 +5,7 @@
  *  Do with this whatever you want, but keep thes Header and tell
  *  the others what you changed!
  *  
- *  Last edited: 2016-10-14
+ *  Last edited: 2017-02-12
  */
 /*
  * Allgemeine Konstanten:
@@ -14,7 +14,7 @@
 #define VERS_HIGH 0       //Versionsnummer vor dem Punkt
 #define VERS_LOW 1        //Versionsnummer nach dem Punkt
 
-#define CONFIG_NUM 10     //Anzahl der Konfigurationspunkte
+#define CONFIG_NUM 9     //Anzahl der Konfigurationspunkte
 #define BOARD_NUM 1       //Identifikationsnummer des Boards (Anzeige in der CS2)
 
 #define SERVO_MIN 70
@@ -27,6 +27,8 @@
 
 #define UID 0x87654321    //CAN-UID
 byte uid_mat[4];
+
+int counter = 0;
 
 uint16_t hash;
 
@@ -51,6 +53,8 @@ Servo servo_3;
 
 
 void setup() {
+  
+  hash = mcan.generateHash(UID);
 
   uid_mat[0] = UID >> 24;
   uid_mat[1] = UID >> 16;
@@ -65,17 +69,16 @@ void setup() {
   device.artNum = "Servo";
   device.name = "MäCAN Decoder";
   device.boardNum = BOARD_NUM;
-  device.type = 0x0050;
-
+  device.type = 0x1234;
+/*
   servo_0.attach(8);
   servo_1.attach(7);
   servo_2.attach(6);
   servo_3.attach(5);
-
+*/
   pinMode(9, OUTPUT);
 
-  hash = mcan.generateHash(UID);
-  mcan.initMCAN(true);
+  mcan.initMCAN();
   
   attachInterrupt(digitalPinToInterrupt(2), interruptFn, LOW);
   
@@ -98,7 +101,7 @@ void accFrame(){
 
 void pingFrame(){  
   if((can_frame_in.cmd == PING) && (can_frame_in.resp_bit == 0)){          //Auf Ping Request antworten
-    mcan.sendPingResponse(device);
+    mcan.sendPingFrame(device, 1);
   }
 }
 
@@ -107,6 +110,14 @@ void configFrame(){
     if((uid_mat[0] == can_frame_in.data[0])&&(uid_mat[1] == can_frame_in.data[1])&&(uid_mat[2] == can_frame_in.data[2])&&(uid_mat[3] == can_frame_in.data[3])){
       config_poll = true;
       config_index = can_frame_in.data[4];
+    }
+  }
+}
+
+void statusFrame(){
+  if((can_frame_in.cmd == SYS_CMD) && (can_frame_in.resp_bit == 0) && (can_frame_in.data[4] == SYS_STAT)){
+    if((uid_mat[0] == can_frame_in.data[0])&&(uid_mat[1] == can_frame_in.data[1])&&(uid_mat[2] == can_frame_in.data[2])&&(uid_mat[3] == can_frame_in.data[3])){
+      mcan.statusResponse(device, can_frame_in.data[5], 1);
     }
   }
 }
@@ -154,19 +165,27 @@ void switchAcc(int num){
   switch(num){
     case 0 : 
       acc_state_is[0] = acc_state_set[0];
+      servo_0.attach(8);
       slowServo(&servo_0, acc_state_set[0]);
+      servo_0.detach();
       break;
     case 1 :
       acc_state_is[1] = acc_state_set[1];
+      servo_1.attach(7);
       slowServo(&servo_1, acc_state_set[1]);
+      servo_1.detach();
       break;
     case 2 :
       acc_state_is[2] = acc_state_set[2];
+      servo_2.attach(6);
       slowServo(&servo_2, acc_state_set[2]);
+      servo_2.detach();
       break;
     case 3 :
       acc_state_is[3] = acc_state_set[3];
+      servo_3.attach(5);
       slowServo(&servo_3, acc_state_set[3]);
+      servo_3.detach();
       break;
       
   }
@@ -197,10 +216,23 @@ void interruptFn(){
   accFrame();
   pingFrame();
   configFrame();
-  //statusFrame();
+  statusFrame();
 }
 
 void loop() {
+  counter++;
+  if(counter == 100){
+    servo_0.attach(8);
+    servo_1.attach(7);
+    servo_2.attach(6);
+    servo_3.attach(5);
+  }
+  if(counter == 110){
+    servo_0.detach();
+    servo_1.detach();
+    servo_2.detach();
+    servo_3.detach();
+  }
   for(int i = 0; i < 4; i++){
     if(acc_state_is[i] != acc_state_set[i]){
       switchAcc(i);
@@ -210,14 +242,13 @@ void loop() {
     if(config_index == 0) mcan.sendDeviceInfo(device, CONFIG_NUM);
     if(config_index == 1) mcan.sendConfigInfoSlider(device, 1, 10, 90, 40, "Winkel_10_90_°");
     if(config_index == 2) mcan.sendConfigInfoSlider(device, 2, 1, 20, 5, "Geschwindigkeit_1_20_ms/°");
-    if(config_index == 3) mcan.sendConfigInfoDropdown(device, 3, 2, 0, "Protokoll Ausgang 1_DCC_MM");
-    if(config_index == 4) mcan.sendConfigInfoSlider(device, 4, 1, 2048, 0, "Adresse Ausgang 1_1_2048");
-    if(config_index == 5) mcan.sendConfigInfoDropdown(device, 5, 2, 0, "Protokoll Ausgang 2_DCC_MM");
-    if(config_index == 6) mcan.sendConfigInfoSlider(device, 6, 1, 2048, 0, "Adresse Ausgang 2_1_2048");
-    if(config_index == 7) mcan.sendConfigInfoDropdown(device, 7, 2, 0, "Protokoll Ausgang 3_DCC_MM");
-    if(config_index == 8) mcan.sendConfigInfoSlider(device, 8, 1, 2048, 0, "Adresse Ausgang 3_1_2048");
-    if(config_index == 9) mcan.sendConfigInfoDropdown(device, 9, 2, 0, "Protokoll Ausgang 4_DCC_MM");
-    if(config_index == 10) mcan.sendConfigInfoSlider(device, 10, 1, 2048, 0, "Adresse Ausgang 4_1_2048");
+    if(config_index == 3) mcan.sendConfigInfoDropdown(device, 3, 2, 0, "Protokoll_DCC_MM");
+    if(config_index == 4) mcan.sendConfigInfoSlider(device, 4, 1, 2048, 1, "Adresse Ausgang 1_1_2048");
+    if(config_index == 5) mcan.sendConfigInfoSlider(device, 5, 1, 2048, 2, "Adresse Ausgang 2_1_2048");
+    if(config_index == 6) mcan.sendConfigInfoSlider(device, 6, 1, 2048, 3, "Adresse Ausgang 3_1_2048");
+    if(config_index == 7) mcan.sendConfigInfoSlider(device, 7, 1, 2048, 4, "Adresse Ausgang 4_1_2048");
+    if(config_index == 8) mcan.sendConfigInfoSlider(device, 8, 1, 2048, 5, "Adresse Ausgang 5_1_2048");
+    if(config_index == 9) mcan.sendConfigInfoSlider(device, 9, 1, 2048, 6, "Adresse Ausgang 6_1_2048");
     config_poll = false;
   }
 }
