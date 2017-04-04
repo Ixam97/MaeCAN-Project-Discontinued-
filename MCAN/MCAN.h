@@ -4,7 +4,7 @@
  *  Do with this whatever you want, but keep thes Header and tell
  *  the others what you changed!
  *
- *  Last changed: 2016-10-17
+ *  Last changed: 2017-01-06
  */
 
 
@@ -91,7 +91,7 @@ public:
 	 *  Parameter: keiner oder "true", um den Debug-Modus zu nutzen.
 	 ******************************************************************************/
 	void initMCAN();
-	void initMCAN(bool debug);
+	void initMCAN(bool debug, CanDevice device);
 
 	/******************************************************************************
 	 *  Name: sendCanFrame
@@ -132,13 +132,30 @@ public:
 	 ******************************************************************************/
 	void sendPingFrame(CanDevice device, bool response);
 
-	/******************************************************************************
-	 *  Name: sendAccessoryFrame
-	 *  Funktion: Sendet einen Schaltauftrag oder die Antwort auf einen.
-	 *  Parameter: Geräteinformationen, Local-ID des zu schaltenden Zubehörs,
-	 *             Zustand des Zubehörs, Auftrag (false) oder Antwort (true).
+  /******************************************************************************
+	 *  Name: switchAccResponse
+	 *  Funktion: Meldung nach erfolgreichem Schalten.
+	 *  Parameter: Geräteinformationen, Local-ID des geschaltenden Zubehörs,
+	 *             Zustand des Zubehörs.
 	 ******************************************************************************/
+   void switchAccResponse(CanDevice device, uint32_t locId, bool state);
+
+   /******************************************************************************
+ 	 *  Name: sendAccessoryFrame
+ 	 *  Funktion: Sendet einen Schaltauftrag oder die Antwort auf einen.
+ 	 *  Parameter: Geräteinformationen, Local-ID des zu schaltenden Zubehörs,
+ 	 *             Zustand des Zubehörs, Auftrag (false) oder Antwort (true).
+ 	 ******************************************************************************/
 	void sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool response);
+    void sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool response, bool power);
+
+  /******************************************************************************
+	 *  Name: checkS88StateFrame
+	 *  Funktion: Fragt den aktuellen Zustand eines Rückmeldekontakt ab.
+	 *  Parameter: Geräteinformationen, Gerätekennung, Kontaktkennung
+	 *              des abzufragenden Kontakt.
+	 ******************************************************************************/
+	void checkS88StateFrame(CanDevice device, uint16_t dev_id, uint16_t contact_id);
 
 	/******************************************************************************
 	 *  Name: getCanFrame
@@ -172,14 +189,14 @@ public:
 	 *  Funktion: Liest einen Konfigurationskanal aus dem EEPROM.
 	 *  Parameter: Konfigurationskanal.
 	 ******************************************************************************/
-	uint16_t getConfigDataFromEEPROM(int chanel);
+	uint16_t getConfigData(int chanel);
 
   /******************************************************************************
 	 *  Name: statusResponse
 	 *  Funktion: Sendet Antwort auf Konfigurationskanal
 	 *  Parameter: Konfigurationskanal
 	 ******************************************************************************/
-  void statusResponse(CanDevice device, int chanel);
+  void statusResponse(CanDevice device, int chanel, int success);
 
 	/******************************************************************************
 	 *  Name: canFrameToString

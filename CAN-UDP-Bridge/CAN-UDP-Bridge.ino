@@ -29,7 +29,7 @@ typedef struct {
 #define INT 2     //Interrupt-Pin
 #define CS 15     //Chip-Select-Pin
 
-#define MODE 0       //Betriebsart: 0: An dem Tragbaren Gerät; 1: An der Gleisbox
+#define MODE 1       //Betriebsart: 0: An dem Tragbaren Gerät; 1: An der Gleisbox
 
 
 #if MODE == 0
@@ -49,6 +49,7 @@ WiFiUDP UDP;
 
 const char* ssid = "SlowRotkohl";
 const char* password = "Hackbraten";
+const char* ssidAP = "MS2-WiFi";
 
 byte udpRxBuf[13];
 byte udpTxBuf[13];
@@ -56,7 +57,7 @@ byte udpTxBuf[13];
 CANBUF canTxBuf;
 CANBUF canRxBuf;
 
-IPAddress broadcast(192,168,1,128);
+IPAddress broadcast[2]{(192,168,4,2),(192,168,4,3)};
 
 void handleRoot() {
   server.send(200, "text/html", "<h1>MS2-WiFi Access Point</h1>");
@@ -128,9 +129,11 @@ void getCan(){
 }
 
 void sendUdp(){
-  UDP.beginPacket(broadcast, PORT_SENDTO);
-  UDP.write(udpTxBuf, 13);
-  UDP.endPacket();  
+  //for(int i = 0; i < 2; i++){
+    UDP.beginPacket(broadcast, PORT_SENDTO);
+    UDP.write(udpTxBuf, 13);
+    UDP.endPacket();  
+  //}
 }
 
 void interruptFn(){
@@ -167,7 +170,7 @@ void setup() {
   Serial.print("\r\n");
 
 #else if MODE == 1
-  WiFi.softAP(ssid);
+  WiFi.softAP(ssidAP);
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
   server.on("/", handleRoot);
@@ -188,7 +191,7 @@ void setup() {
   }
   pinMode(INT, INPUT);
 
-  attachInterrupt(INT, interruptFn, LOW);
+  //attachInterrupt(INT, interruptFn, LOW);
 
 }
 
@@ -201,10 +204,14 @@ void loop() {
   if(packetsize){
     for(int i = 0; i < 13; i++){
       udpRxBuf[i] = UDP.read();
+      udpTxBuf[i] = udpRxBuf[i];
     }
     udpToCan();
     sendCan();
+    sendUdp();
   }
+
+  if(!digitalRead(INT)) interruptFn();
 
 }
 

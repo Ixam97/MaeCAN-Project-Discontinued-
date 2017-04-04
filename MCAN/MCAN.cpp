@@ -4,7 +4,7 @@
  *  Do with this whatever you want, but keep thes Header and tell
  *  the others what you changed!
  *
- *  Last changed: 2016-10-17
+ *  Last changed: 2017-02-13
  */
 
 
@@ -14,6 +14,7 @@
 #include <EEPROM.h>
 
 MCP_CAN can(10);
+bool mcan_debug = 0;
 
 uint16_t MCAN::generateHash(uint32_t uid){
 
@@ -39,14 +40,20 @@ uint16_t MCAN::getadrs(uint16_t prot, uint16_t locid){
   return (locid + 1 - prot);
 }
 
-void MCAN::initMCAN(bool debug){
+void MCAN::initMCAN(bool debug, CanDevice device){
 
-	if(debug) Serial.begin(250000);
+	if(debug) {
+		Serial.begin(250000);
+		mcan_debug = 1;
+  }
 	pinMode(9,OUTPUT);
 	digitalWrite(9,0);
 	if (can.begin(CAN_250KBPS) == CAN_OK){
 		digitalWrite(9,1);
-		Serial.println("CAN-Init Successfull!");
+		if(mcan_debug) {
+			Serial.println("CAN-Init Successfull!");
+			Serial.print("UID: 0x"); Serial.println(device.uid, HEX);
+		}
 	}
 }
 void MCAN::initMCAN(){
@@ -200,7 +207,6 @@ void MCAN::sendConfigInfoSlider(CanDevice device, uint8_t configChanel, uint16_t
 	sendCanFrame(can_frame);
 	can_frame.hash++;
 	frameCounter++;
-	Serial.println(frameCounter);
 
 	//Frames, die Strings enthalten:
 
@@ -253,6 +259,43 @@ void MCAN::sendPingFrame(CanDevice device, bool response){
 	sendCanFrame(can_frame);
 }
 
+void MCAN::switchAccResponse(CanDevice device, uint32_t locId, bool state){
+
+	MCANMSG can_frame;
+	int adrs;
+
+	can_frame.cmd = SWITCH_ACC;
+	can_frame.resp_bit = 1;
+	can_frame.hash = device.hash;
+	can_frame.dlc = 6;
+	can_frame.data[0] = 0;
+	can_frame.data[1] = 0;
+	can_frame.data[2] = locId >> 8;
+	can_frame.data[3] = locId;
+	can_frame.data[4] = state;            /* Meldung der Lage für Märklin-Geräte.*/
+  	can_frame.data[5] = 0;
+  	sendCanFrame(can_frame);
+
+  	can_frame.data[4] = 0xfe - state;     /* Meldung für CdB-Module und Rocrail Feldereignisse. */
+  	sendCanFrame(can_frame);
+
+	//Serial.println("S88-Weichenevent");
+
+	can_frame.cmd = S88_EVENT;
+	can_frame.dlc = 8;
+	can_frame.data[2] = locId >> 8;
+	can_frame.data[3] = locId - (state - 1);
+	can_frame.data[4] = 1;
+	can_frame.data[5] = 0;
+	can_frame.data[6] = 0;
+	can_frame.data[7] = 0;
+  	sendCanFrame(can_frame);
+	can_frame.data[3] = locId + state;
+	can_frame.data[4] = 0;
+	can_frame.data[5] = 1;
+  	sendCanFrame(can_frame);
+ }
+
 void MCAN::sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool response){
 
 	MCANMSG can_frame;
@@ -267,13 +310,39 @@ void MCAN::sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool
 	can_frame.data[3] = locId;
 	can_frame.data[4] = state;
 	can_frame.data[5] = 1;		//old value: 0
-
 	sendCanFrame(can_frame);
-/*
-	can_frame.data[4] = 0xfe - state;
+}
 
+void MCAN::sendAccessoryFrame(CanDevice device, uint32_t locId, bool state, bool response, bool power){
+
+	MCANMSG can_frame;
+
+	can_frame.cmd = SWITCH_ACC;
+	can_frame.resp_bit = response;
+	can_frame.hash = device.hash;
+	can_frame.dlc = 6;
+	can_frame.data[0] = 0;
+	can_frame.data[1] = 0;
+	can_frame.data[2] = locId >> 8;
+	can_frame.data[3] = locId;
+	can_frame.data[4] = state;
+	can_frame.data[5] = power;
 	sendCanFrame(can_frame);
-*/
+}
+
+void MCAN::checkS88StateFrame(CanDevice device, uint16_t dev_id, uint16_t contact_id){
+
+	MCANMSG can_frame;
+
+	can_frame.cmd = S88_EVENT;
+	can_frame.resp_bit = 0;
+	can_frame.hash = device.hash;
+	can_frame.dlc = 4;
+	can_frame.data[0] = dev_id >> 8;
+	can_frame.data[1] = dev_id;
+	can_frame.data[2] = contact_id >> 8;
+	can_frame.data[3] = contact_id;
+	sendCanFrame(can_frame);
 }
 
 MCANMSG MCAN::getCanFrame(){
@@ -308,30 +377,18 @@ void MCAN::saveConfigData(CanDevice device, MCANMSG can_frame){
 
 	int chanel = can_frame.data[5] - 1;
 
-	Serial.println("Saving Config Data...");
+	EEPROM.put((chanel*2), can_frame.data[6]);
+	EEPROM.put((chanel*2) + 1, can_frame.data[7]);
 
-	//EEPROM.put((chanel*2), can_frame.data[6]);
-	//EEPROM.put((chanel*2) + 1, can_frame.data[7]);
-
-	MCANMSG can_frame_out;
-
-	can_frame_out.cmd = SYS_CMD;
-	can_frame_out.hash = device.hash;
-	can_frame_out.resp_bit = true;
-	can_frame_out.dlc = 7;
-	for(int i = 0; i < 6; i++){ can_frame_out.data[i] = can_frame.data[i];}
-	can_frame_out.data[6] = 1;
-	can_frame_out.data[7] = 0;
-
-	sendCanFrame(can_frame_out);
+	statusResponse(device, chanel + 1, true);
 }
 
-uint16_t MCAN::getConfigDataFromEEPROM(int chanel){
+uint16_t MCAN::getConfigData(int chanel){
 	chanel--;
-	return (EEPROM.read((chanel*2) << 8) + EEPROM.read((chanel*2) + 1));
+	return ((EEPROM.read(chanel*2) << 8) + EEPROM.read((chanel*2) + 1));
 }
 
-void MCAN::statusResponse(CanDevice device, int chanel){
+void MCAN::statusResponse(CanDevice device, int chanel, int success){
 	MCANMSG can_frame_out;
 
   can_frame_out.cmd = SYS_CMD;
@@ -344,7 +401,7 @@ void MCAN::statusResponse(CanDevice device, int chanel){
   can_frame_out.data[3] = device.uid;
   can_frame_out.data[4] = SYS_STAT;
   can_frame_out.data[5] = chanel;
-  can_frame_out.data[6] = true;
+  can_frame_out.data[6] = success;
   can_frame_out.data[7] = 0;
 
   sendCanFrame(can_frame_out);
