@@ -26,7 +26,7 @@
 
 
 #define DEBUG false        // Serielle Debug-Schnittstelle. IO 7 und 8 nicht nutzbar!
-#define CS true           // Konfiguration über eine Central Station
+#define CS false           // Konfiguration über eine Central Station
 
 
 #define VERS_HIGH 0       // Versionsnummer vor dem Punkt
@@ -56,18 +56,19 @@ uint16_t hash;
 bool config_poll = false;
 bool config_changed = false;
 
-//                      |Servo 1|Servo 2|Servo 3|Servo 4|Servo 5|Servo 6|Servo 7|Servo 8|Servo 9|Servo 10|
-uint16_t acc_locid[] =  {0x3800, 0x3801, 0x3802, 0x3803, 0x3804, 0x3805, 0x3806, 0x3807, 0x3808, 0x3809}; // Loc-ID
-bool acc_state_is[] =   {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Momentanstatus (0 = rot, 1 = grün)
-bool acc_state_set[] =  {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Soll-Status
-int servo_min[] =       {70,     70,     70,     70,     70,     70,     70,     70,     70,     70};     // Linker Anschlag (°)
-int servo_max[] =       {110,    110,    110,    110,    110,    110,    110,    110,    110,    110};    // Rechter Anschlag (°)
-int servo_speed[] =     {20,     20,     20,     20,     20,     20,     20,     20,     20,     20};     // Geschwindigkeit (ms/°)
-int servo_inverted[] =  {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Richtung invertiert
+//                       |Servo 1|Servo 2|Servo 3|Servo 4|Servo 5|Servo 6|Servo 7|Servo 8|Servo 9|Servo 10|
+uint16_t acc_locid[] =   {0x3800, 0x3801, 0x3802, 0x3803, 0x3804, 0x3805, 0x3806, 0x3807, 0x3808, 0x3809}; // Loc-ID
+bool acc_state_is[] =    {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Momentanstatus (0 = rot, 1 = grün)
+int acc_state_is_reg[] = {46,     47,     48,     49,     50,     51,     52,     53,     54,     55};     // EEPROM-Register der aktuellen Stellung
+bool acc_state_set[] =   {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Soll-Status
+int servo_min[] =        {70,     70,     70,     70,     70,     70,     70,     70,     70,     70};     // Linker Anschlag (°)
+int servo_max[] =        {110,    110,    110,    110,    110,    110,    110,    110,    110,    110};    // Rechter Anschlag (°)
+int servo_speed[] =      {20,     20,     20,     20,     20,     20,     20,     20,     20,     20};     // Geschwindigkeit (ms/°)
+int servo_inverted[] =   {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Richtung invertiert
 #if DEBUG
-int servo_io[] =        {8,      7,      6,      5,      4,      3,      16,     15};                     // Hardware-Pins
-#else                                                                                                     //
-int servo_io[] =        {8,      7,      6,      5,      4,      3,      1,      0,      16,     15};     //
+int servo_io[] =         {8,      7,      6,      5,      4,      3,      16,     15};                     // Hardware-Pins
+#else                                                                                                      //
+int servo_io[] =         {8,      7,      6,      5,      4,      3,      1,      0,      16,     15};     //
 #endif
 /*
 int servo_min = 70;
@@ -87,10 +88,32 @@ Servo servo;
 
 void setup() {
 
+  pinMode(9, OUTPUT);
+
   if(EEPROM.read(0) > 1){
+    for(int i = 0; i < 5; i++){
+      digitalWrite(9,1);
+      delay(200);
+      digitalWrite(9,0);
+      delay(200);
+    }
     for(int i = 0; i < EEPROM.length(); i++){
       EEPROM.write(i,0);
     }
+  }else{
+    for(int i = 0; i < 5; i++){
+      digitalWrite(9,1);
+      delay(100);
+      digitalWrite(9,0);
+      delay(100);
+    }
+  }
+
+  for(int i = 0; i < SERVO_NUM; i++){
+    bool eeprom_value = EEPROM.read(acc_state_is_reg[i]);
+    if(eeprom_value <= 1)acc_state_is[i] = eeprom_value;
+    else acc_state_is[i] = 0;
+    acc_state_set[i] = acc_state_is[i];
   }
   
   hash = mcan.generateHash(UID);      // Erzeugung des Hash aus der UID
@@ -114,10 +137,11 @@ void setup() {
   device.boardNum = BOARD_NUM;
   device.type = 0x1234;
 
-  mcan.initMCAN(DEBUG, device);
+  mcan.initMCAN(DEBUG, device, 9);
   
   for(int i = 0; i < SERVO_NUM; i++){
-    switchAcc(i);
+    switchAcc(i, !acc_state_is[i]);
+    switchAcc(i, !acc_state_is[i]);
   }
   attachInterrupt(digitalPinToInterrupt(2), interruptFn, LOW);
 }
@@ -157,199 +181,13 @@ void statusFrame(){
   }
 }
 
-void statusResponse(int chanel){
-  can_frame_out.cmd = SYS_CMD;
-  can_frame_out.hash = hash;
-  can_frame_out.resp_bit = true;
-  can_frame_out.dlc = 7;
-  for(int i = 0; i < 4; i++){
-    can_frame_out.data[i] = uid_mat[i];
-  }
-  can_frame_out.data[4] = SYS_STAT;
-  can_frame_out.data[5] = chanel;
-  can_frame_out.data[6] = true;
-  can_frame_out.data[7] = 0;
-  
-  mcan.sendCanFrame(can_frame_out);
-}
-
-/*
- * Meldung nach erfolgreichem Schalten
- */
-void switchAccResponse(int acc_num, bool set_state){
-  can_frame_out.cmd = SWITCH_ACC;
-  can_frame_out.hash = hash;
-  can_frame_out.resp_bit = true;
-  can_frame_out.dlc = 6;
-  can_frame_out.data[0] = 0;
-  can_frame_out.data[1] = 0;
-  can_frame_out.data[2] = acc_locid[acc_num] >> 8;
-  can_frame_out.data[3] = acc_locid[acc_num];
-  can_frame_out.data[4] = set_state;            /* Meldung der Lage für Märklin-Geräte.*/
-  can_frame_out.data[5] = 0;
-
-  mcan.sendCanFrame(can_frame_out);
-  
-  can_frame_out.data[4] = 0xfe - set_state;     /* Meldung für CdB-Module und Rocrail Feldereignisse. */
-  
-  mcan.sendCanFrame(can_frame_out);
-}
-
-void switchAcc(int num){
+void switchAcc(int num, bool state_set){
   digitalWrite(9, 1);
 
-  slowServo(num);
-  /*switch(num){
-    case 0 : 
-      acc_state_is[0] = acc_state_set[0];
-      servo.attach(IO_1);
-      slowServo(&servo, acc_state_set[0]);
-      #if DEBUG
-      Serial.print("switching Port IO_1 to ");
-      Serial.println(acc_state_set[0]);
-      #endif
-      servo.detach();
-      break;
-    case 1 :
-      acc_state_is[1] = acc_state_set[1];
-      servo.attach(IO_2);
-      slowServo(&servo, acc_state_set[1]);
-      #if DEBUG
-      Serial.print("switching Port IO_2 to ");
-      Serial.println(acc_state_set[1]);
-      #endif
-      servo.detach();
-      break;
-    case 2 :
-      acc_state_is[2] = acc_state_set[2];
-      servo.attach(IO_3);
-      slowServo(&servo, acc_state_set[2]);
-      #if DEBUG
-      Serial.print("switching Port IO_3 to ");
-      Serial.println(acc_state_set[2]);
-      #endif
-      servo.detach();
-      break;
-    case 3 :
-      acc_state_is[3] = acc_state_set[3];
-      servo.attach(IO_4);
-      slowServo(&servo, acc_state_set[3]);
-      #if DEBUG
-      Serial.print("switching Port IO_4 to ");
-      Serial.println(acc_state_set[3]);
-      #endif
-      servo.detach();
-      break;
-    case 4 :
-      acc_state_is[4] = acc_state_set[4];
-      servo.attach(IO_5);
-      slowServo(&servo, acc_state_set[4]);
-      #if DEBUG
-      Serial.print("switching Port IO_5 to ");
-      Serial.println(acc_state_set[4]);
-      #endif
-      servo.detach();
-      break;
-    case 5 :
-      acc_state_is[5] = acc_state_set[5];
-      servo.attach(IO_6);
-      slowServo(&servo, acc_state_set[5]);
-      #if DEBUG
-      Serial.print("switching Port IO_6 to ");
-      Serial.println(acc_state_set[5]);
-      #endif
-      servo.detach();
-      break;
-    #if DEBUG
-    case 6 :
-      acc_state_is[6] = acc_state_set[6];
-      servo.attach(IO_9);
-      slowServo(&servo, acc_state_set[6]);
-      #if DEBUG
-      Serial.print("switching Port IO_9 to ");
-      Serial.println(acc_state_set[6]);
-      #endif
-      servo.detach();
-      break;
-    case 7 :
-      acc_state_is[7] = acc_state_set[7];
-      servo.attach(IO_10);
-      slowServo(&servo, acc_state_set[7]);
-      #if DEBUG
-      Serial.print("switching Port IO_10 to ");
-      Serial.println(acc_state_set[7]);
-      #endif
-      servo.detach();
-      break;
-    #else
-    case 6 :
-      acc_state_is[6] = acc_state_set[6];
-      servo.attach(IO_7);
-      slowServo(&servo, acc_state_set[6]);
-      #if DEBUG
-      Serial.print("switching Port IO_7 to ");
-      Serial.println(acc_state_set[6]);
-      #endif
-      servo.detach();
-      break;
-    case 7 :
-      acc_state_is[7] = acc_state_set[7];
-      servo.attach(IO_8);
-      slowServo(&servo, acc_state_set[7]);
-      #if DEBUG
-      Serial.print("switching Port IO_8 to ");
-      Serial.println(acc_state_set[7]);
-      #endif
-      servo.detach();
-      break;
-    case 8 :
-      acc_state_is[8] = acc_state_set[8];
-      servo.attach(IO_9);
-      slowServo(&servo, acc_state_set[8]);
-      #if DEBUG
-      Serial.print("switching Port IO_9 to ");
-      Serial.println(acc_state_set[8]);
-      #endif
-      servo.detach();
-      break;
-    case 9 :
-      acc_state_is[9] = acc_state_set[9];
-      servo.attach(IO_10);
-      slowServo(&servo, acc_state_set[9]);
-      #if DEBUG
-      Serial.print("switching Port IO_10 to ");
-      Serial.println(acc_state_set[9]);
-      #endif
-      servo.detach();
-      break;
-    #endif
-    default: break;
-      
-  }*/
-  mcan.switchAccResponse(device, acc_locid[num], acc_state_is[num]);
-  digitalWrite(9,0);
-}
-
-/* Langsame Bewegung der Servos, nur ein Servo zur selben Zeit */
-/*void slowServo(Servo *servo, bool state){
-  if(state){
-    for(int i = servo_min + 1; i <= servo_max; i++){
-      servo->write(i);
-      delay(servo_speed);
-    }
-  }else{
-    for(int i = servo_max - 1; i >= servo_min; i--){
-      servo->write(i);
-      delay(servo_speed);
-    }
-  }
-}
-*/
-
-void slowServo(int num){
-  acc_state_is[num] = acc_state_set[num];
+  EEPROM.put(acc_state_is_reg[num], state_set);
+  acc_state_is[num] = state_set;
   servo.attach(servo_io[num]);
-  if(acc_state_set[num]){
+  if(state_set){
     for(int i = servo_min[num]; i <= servo_max[num]; i++){
       servo.write(i);
       delay(servo_speed[num]);
@@ -360,8 +198,11 @@ void slowServo(int num){
       delay(servo_speed[num]);
     }
   }
-}
+  servo.detach();
   
+  mcan.switchAccResponse(device, acc_locid[num], acc_state_is[num]);
+  digitalWrite(9,0);
+}
 
 /* Laden der im EEPROM gespeicherten Einstellungen */
 void loadConfig(){/*
@@ -397,9 +238,11 @@ void loop() {
   
   for(int i = 0; i < SERVO_NUM; i++){
     if(acc_state_is[i] != acc_state_set[i]){
-      switchAcc(i);
+      switchAcc(i, acc_state_set[i]);
     }
   }
+
+  #if CS
   
   if(config_poll){
     int c = 0;
@@ -429,6 +272,8 @@ void loop() {
     if(config_index == 23) mcan.sendConfigInfoDropdown(device, 23, 2, mcan.getConfigData(23), "Invertieren_Nein_Ja");
     config_poll = false;
   }
+
+  #endif
 }
 
 
