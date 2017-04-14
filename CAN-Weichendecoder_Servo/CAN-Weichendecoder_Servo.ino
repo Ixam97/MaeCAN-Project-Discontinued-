@@ -57,7 +57,7 @@ bool config_poll = false;
 bool config_changed = false;
 
 //                       |Servo 1|Servo 2|Servo 3|Servo 4|Servo 5|Servo 6|Servo 7|Servo 8|Servo 9|Servo 10|
-uint16_t acc_locid[] =   {0x3800, 0x3801, 0x3802, 0x3803, 0x3804, 0x3805, 0x3806, 0x3807, 0x3808, 0x3809}; // Loc-ID
+uint16_t acc_locid[] =   {0x3000, 0x3001, 0x3002, 0x3003, 0x3004, 0x3005, 0x3006, 0x3007, 0x3008, 0x3009}; // Loc-ID
 bool acc_state_is[] =    {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Momentanstatus (0 = rot, 1 = grün)
 int acc_state_is_reg[] = {46,     47,     48,     49,     50,     51,     52,     53,     54,     55};     // EEPROM-Register der aktuellen Stellung
 bool acc_state_set[] =   {0,      0,      0,      0,      0,      0,      0,      0,      0,      0};      // Soll-Status
@@ -87,6 +87,10 @@ Servo servo;
 
 
 void setup() {
+
+  #if CS == false
+  CONFIG_NUM = 0;
+  #endif
 
   pinMode(9, OUTPUT);
 
@@ -228,8 +232,8 @@ void interruptFn(){
   can_frame_in = mcan.getCanFrame();
   accFrame();
   pingFrame();
-  #if CS
   configFrame();
+  #if CS
   statusFrame();
   #endif
 }
@@ -242,11 +246,11 @@ void loop() {
     }
   }
 
-  #if CS
   
   if(config_poll){
     int c = 0;
     if(config_index == 0) mcan.sendDeviceInfo(device, CONFIG_NUM);
+  #if CS
     if(config_index == 1) mcan.sendConfigInfoSlider(device, 1, 10, 90, mcan.getConfigData(1), "Winkel_10_90_°");
     if(config_index == 2) mcan.sendConfigInfoSlider(device, 2, 2, 20, mcan.getConfigData(2), "Geschwindigkeit_2_20_ms/°");
     if(config_index == 3) mcan.sendConfigInfoDropdown(device, 3, 2, mcan.getConfigData(3), "Protokoll_DCC_MM");
@@ -270,10 +274,10 @@ void loop() {
     if(config_index == 21) mcan.sendConfigInfoDropdown(device, 21, 2, mcan.getConfigData(21), "Invertieren_Nein_Ja");
     if(config_index == 22) mcan.sendConfigInfoSlider(device, 22, 1, 2048, mcan.getConfigData(22), "Servo 10 Adresse_1_2048");
     if(config_index == 23) mcan.sendConfigInfoDropdown(device, 23, 2, mcan.getConfigData(23), "Invertieren_Nein_Ja");
+  #endif
     config_poll = false;
   }
 
-  #endif
 }
 
 

@@ -1,0 +1,23 @@
+[lokomotive]
+version
+ .minor=3
+session
+ .id=2
+lokomotive
+ .name=Triebwagen
+ .uid=0x804
+ .adresse=0x4
+ .typ=sx1
+ .sid=0x73
+ .icon=610
+ .symbol=1
+ .av=60
+ .bv=40
+ .volume=100
+ .progmask=0x3
+ .vmin=13
+ .xprot=2
+ .mfxtyp=47
+ .funktionen
+ ..nr=0
+ ..typ=1

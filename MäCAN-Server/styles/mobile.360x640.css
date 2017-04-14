@@ -1,0 +1,109 @@
+body{
+    background-color: black;
+    width: 360px;
+    height: 567px;
+    padding: 0;
+}
+
+#header{
+    line-height: 30px;
+    height: 50px;
+    font-size: 20px;
+    padding: 0;
+}
+
+#header > div {
+    float: left;
+    font-size: 2rem;
+    margin: 1rem;
+}
+
+#options{
+    background-color: #9BCCEC;
+    float: right;
+    border-radius: .5rem;
+    line-height: 4rem;
+    width: 8rem;
+    margin: .5rem;
+    text-align: center;
+}
+
+#content{
+    height: 497Px;
+    padding: 10px;
+}
+
+.subcontainer{
+    height: auto;
+}
+
+#confirm_adress{
+    background-color: #dadada;
+    border: .2rem solid #adadad;
+    border-radius: .5rem;
+    line-height: 4.3rem;
+    width: 7rem;
+    margin: .5rem;
+    text-align: center;
+}
+
+#locoselector > div, .dropdown_point{
+    background-color: white;
+    margin: .5rem;
+    border: .2rem solid #adadad;
+    border-radius: .5rem;
+    line-height: 4.3rem;
+    text-align: center;
+}
+
+#locoselector_list{
+    margin: -.5rem .5rem;
+    width: 330px;
+    position: absolute;
+    z-index: 1;
+}
+
+.dropdown_point{
+    border-top: 0;
+    margin: 0;
+}
+
+.controlscontainer > div{
+    width: 110px;
+}
+
+.slider > div{
+    margin: 1.5rem .5rem;
+}
+
+#js-rangeslider-0 {
+}
+
+#change_direction{
+    background-color: #dadada;
+    border: .2rem solid #adadad;
+    border-radius: .5rem;
+    margin: .5rem .5rem .5rem .5rem;
+    width: 96px;
+    display: block;
+    height: 50px;
+}
+
+#change_direction > div > div{
+    margin: .5rem;
+}
+
+.function{
+    background-color: #dadada;
+    border: 0.2rem solid #adadad;
+    border-radius: 0.5rem;
+    text-align: center;
+    line-height: 2.4rem;
+    margin: 1.5rem .5rem;
+}
+
+.stopgobutton{
+    line-height: 3.6rem;
+    margin: 0 .5rem;
+    border-radius: .5rem;
+}

@@ -1,0 +1,150 @@
+[lokliste]
+version
+ .major=1
+lokomotive
+ .name=BR 101
+ .symbol=1
+ .uid=0xc002
+ .icon=DB BR 101 104-8
+ .iconcf=DB BR 101 104-8
+ .tachomax=220
+ .funktionen
+ ..typ=1
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=8
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+lokomotive
+ .name=BR 218
+ .symbol=1
+ .uid=0xc001
+ .icon=DB BR 218 161-8
+ .iconcf=DB BR 218 161-8
+ .tachomax=100
+ .funktionen
+ ..typ=1
+ .funktionen
+ ..typ=51
+ .funktionen
+ ..typ=52
+ .funktionen
+ ..typ=53
+ .funktionen
+ ..typ=54
+ .funktionen
+ ..typ=55
+ .funktionen
+ ..typ=56
+ .funktionen
+ ..typ=57
+ .funktionen
+ ..typ=58
+ .funktionen
+ ..typ=59
+ .funktionen
+ ..typ=60
+ .funktionen
+ ..typ=61
+ .funktionen
+ ..typ=62
+ .funktionen
+ ..typ=63
+ .funktionen
+ ..typ=64
+ .funktionen
+ ..typ=65
+lokomotive
+ .name=BR 232
+ .symbol=1
+ .uid=0xc00a
+ .icon=DB BR 232 232-9
+ .iconcf=DB BR 232 232-9
+ .tachomax=600
+ .funktionen
+ ..typ=1
+ .funktionen
+ ..typ=5
+ .funktionen
+ ..typ=2
+ .funktionen
+ ..typ=10
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+lokomotive
+ .name=DCC Lok 3
+ .symbol=1
+ .uid=0x18003
+ .icon=KWStE T 5 1231
+ .iconcf=KWStE T 5 1231
+ .tachomax=120
+ .funktionen
+ ..typ=1
+ .funktionen
+ ..typ=51
+ .funktionen
+ ..typ=52
+ .funktionen
+ ..typ=53
+ .funktionen
+ ..typ=54
+ .funktionen
+ ..typ=55
+ .funktionen
+ ..typ=56
+ .funktionen
+ ..typ=57
+ .funktionen
+ ..typ=58
+ .funktionen
+ ..typ=59
+ .funktionen
+ ..typ=60
+ .funktionen
+ ..typ=61
+ .funktionen
+ ..typ=62
+ .funktionen
+ ..typ=63
+ .funktionen
+ ..typ=64
+ .funktionen
+ ..typ=65
+lokomotive
+ .name=WLE 22
+ .symbol=1
+ .uid=0x16
+ .icon=WLE BR 223 22
+ .iconcf=WLE BR 223 22
+ .tachomax=160
+ .funktionen
+ ..typ=1
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=8
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
+ .funktionen
+ ..typ=0
