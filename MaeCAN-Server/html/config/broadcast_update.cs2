@@ -1,0 +1,57 @@
+[lokomotive]
+lokomotive
+ .name=WLE 22
+ .uid=0x16
+ .typ=mm2_prg
+ .icon=WLE BR 223 22
+ .symbol=1
+ .tachomax=120
+ .vmax=63
+ .funktionen
+ ..nr=0
+ ..typ=1
+ .funktionen
+ ..nr=1
+ ..typ=51
+ .funktionen
+ ..nr=2
+ ..typ=52
+ .funktionen
+ ..nr=3
+ ..typ=53
+ .funktionen
+ ..nr=4
+ ..typ=54
+ .funktionen
+ ..nr=5
+ ..typ=55
+ .funktionen
+ ..nr=6
+ ..typ=56
+ .funktionen
+ ..nr=7
+ ..typ=57
+ .funktionen
+ ..nr=8
+ ..typ=58
+ .funktionen
+ ..nr=9
+ ..typ=59
+ .funktionen
+ ..nr=10
+ ..typ=60
+ .funktionen
+ ..nr=11
+ ..typ=61
+ .funktionen
+ ..nr=12
+ ..typ=62
+ .funktionen
+ ..nr=13
+ ..typ=63
+ .funktionen
+ ..nr=14
+ ..typ=64
+ .funktionen
+ ..nr=15
+ ..typ=65
