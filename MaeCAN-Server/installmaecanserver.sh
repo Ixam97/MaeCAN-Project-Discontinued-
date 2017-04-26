@@ -3,10 +3,6 @@
 sudo su
 echo -e '\033[0;34m Updating ... \033[0m'
 apt-get update
-echo -e '\033[0;34m Setting up Node lts Boron ...\033[0m'
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-apt-get install -y nodejs
-apt-get install -y apache2 php libapache2-mod-php7.0
 echo -e '\033[0;34m Setting up node server ...\033[0m'
 cd /tmp/
 mkdir server/
@@ -29,6 +25,6 @@ cd railroad/can2udp/src/
 make
 cp can2udp /usr/bin/
 cp can2lan /usr/bin/
-echo -e '\033[0;32m Done!\033[0m'
+echo -e '\033[0;32m Done!\033[0m \n Please Run "curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -" \n        and "apt-get install apache2 php libapache2-mod-php7.0 nodejs"'
 
 exit 0
