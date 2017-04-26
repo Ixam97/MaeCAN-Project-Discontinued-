@@ -1,11 +1,16 @@
 #! /bin/bash
 
-echo 'Installing needed packages ...'
-apt-get install apache2 php5 nodejs nodejs-legacy npm
+sudo su
+echo 'Setting up Node lts Boron ...'
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+nvm install --lts=boron
+nvm use --lts=boron
 echo 'Setting up node server ...'
 rm /var/www/html/index.html
-mv -R html/ /var/www/ 
-mv -R node/ /var/www/
+cp -R html/ /var/www/ 
+cp -R node/ /var/www/
 cd /var/www/node/
 npm install websocket ini
 echo 'Updating device tree for CAN ...'
@@ -21,3 +26,4 @@ cp can2udp /usr/bin/
 cp can2lan /usr/bin/
 echo 'Done'
 
+exit 0
