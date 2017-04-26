@@ -6,7 +6,7 @@ apt-get update
 echo -e '\033[0;34m Setting up Node lts Boron ...\033[0m'
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 apt-get install -y nodejs
-apt-get install apache2 php libapache2-mod-php7.0
+apt-get install -y apache2 php libapache2-mod-php7.0
 echo -e '\033[0;34m Setting up node server ...\033[0m'
 cd /tmp/
 mkdir server/
