@@ -8,6 +8,11 @@ export NVM_DIR="$HOME/.nvm"
 nvm install --lts=boron
 nvm use --lts=boron
 echo 'Setting up node server ...'
+cd /tmp/
+mkdir server/
+cd server/
+wget https://github.com/Ixam97/MaeCAN-Project/raw/master/MaeCAN-Server/MaeCAN-Server.zip
+unzip MaeCAN-Server.zip
 rm /var/www/html/index.html
 cp -R html/ /var/www/ 
 cp -R node/ /var/www/
