@@ -1,7 +1,7 @@
 #! /bin/bash
 
 sudo su
-echo -e '\033[0;34m Setting up node server ...\033[0m'
+echo -e '\033[0;34m Setting up Node server ...\033[0m'
 cd /var/www/
 wget https://github.com/Ixam97/MaeCAN-Project/raw/master/MaeCAN-Server/MaeCAN-Server.zip
 unzip MaeCAN-Server.zip
@@ -18,6 +18,11 @@ cd railroad/can2udp/src/
 make
 cp can2udp /usr/bin/
 cp can2lan /usr/bin/
+echo -e '\033[0;32m Setting up startup script...\033[0m'
+cd /etc/init.d/
+wget https://raw.githubusercontent.com/Ixam97/MaeCAN-Project/master/MaeCAN-Server/maecanserver.sh
+chmod +x maecanserver.sh
+update-rc.d maecanserver.sh defaults
 echo -e '\033[0;32m Done!\033[0m'
 
 exit 0
