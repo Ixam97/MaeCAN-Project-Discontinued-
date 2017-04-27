@@ -3,6 +3,7 @@
 sudo su
 echo -e '\033[0;34m Setting up Node server ...\033[0m'
 cd /var/www/
+rm /var/www/html/index.html
 wget https://raw.github.com/Ixam97/MaeCAN-Project/master/MaeCAN-Server/updatemaecanserver.sh
 wget https://raw.github.com/Ixam97/MaeCAN-Project/master/MaeCAN-Server/MaeCAN-Server.zip
 unzip -o MaeCAN-Server.zip
