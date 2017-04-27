@@ -7,7 +7,7 @@ rm /var/www/html/index.php
 rm /war/www/html/index.html
 wget https://raw.github.com/Ixam97/MaeCAN-Project/master/MaeCAN-Server/updatemaecanserver.sh
 wget https://raw.github.com/Ixam97/MaeCAN-Project/master/MaeCAN-Server/MaeCAN-Server.zip
-unzip MaeCAN-Server.zip
+unzip MaeCAN-Server.zip -y
 cd /var/www/node/
 npm install websocket ini
 echo -e '\033[0;34m Updating device tree for CAN ...\033[0m'
