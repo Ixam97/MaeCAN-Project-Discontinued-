@@ -4,6 +4,7 @@ rm -R ./node/
 rm -R ./html/
 wget https://github.com/Ixam97/MaeCAN-Project/raw/master/MaeCAN-Server/MaeCAN-Server.zip
 unzip MaeCAN-Server.zip
+wget https://raw.githubusercontent.com/Ixam97/MaeCAN-Project/master/MaeCAN-Server/updatemaecanserver.sh
 mv /tmp/config/ /var/www/html/config/
 cd ./node/
 npm install ini websocket
