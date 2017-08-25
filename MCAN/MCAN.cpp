@@ -364,7 +364,7 @@ int MCAN::checkAccessoryFrame(MCANMSG can_frame, uint16_t locIds[], int accNum, 
 
 	uint16_t currentLocId = (can_frame.data[2] << 8) | can_frame.data[3];
 
-	if((can_frame.cmd == SWITCH_ACC) || (can_frame.resp_bit == response)){
+	if((can_frame.cmd == SWITCH_ACC) && (can_frame.resp_bit == response)){
 		for( int i = 0; i < accNum; i++){
 			if(currentLocId == locIds[i]) return i;
 		}
